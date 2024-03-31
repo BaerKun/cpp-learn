@@ -16,6 +16,8 @@ public:
     void bind() const;
 
     static void setParam(GLenum param, GLenum value);
+
+    void use() const;
 };
 
 #endif //OPENGL_TEXTURE_H

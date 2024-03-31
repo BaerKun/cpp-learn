@@ -2,12 +2,15 @@
 #define OPENGL_SHADER_HPP
 
 #include "glad/glad.h"
+#include "glm.hpp"
 
 class ShaderProgram {
 public:
     GLuint id;
 
     ShaderProgram(const char *vertex_path, const char *fragment_path);
+
+    ~ShaderProgram();
 
     void use() const;
 

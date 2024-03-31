@@ -104,3 +104,7 @@ void ShaderProgram::setUniformm(const char *name, float *value, int rowcols) con
             break;
     }
 }
+
+ShaderProgram::~ShaderProgram() {
+    glDeleteProgram(this->id);
+}

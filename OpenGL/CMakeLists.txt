@@ -21,7 +21,9 @@ add_library(utils STATIC
         src/shader.cpp
         src/texture.cpp
         src/init_window.cpp
-        src/vertex_array.cpp)
+        src/vertex_array.cpp
+        src/camera.cpp
+        include/camera.h)
 
 add_executable(OpenGL src/main.cpp)
 

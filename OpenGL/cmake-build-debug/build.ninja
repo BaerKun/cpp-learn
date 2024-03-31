@@ -77,6 +77,13 @@ build CMakeFiles/utils.dir/src/vertex_array.cpp.o: CXX_COMPILER__utils_unscanned
   OBJECT_DIR = CMakeFiles/utils.dir
   OBJECT_FILE_DIR = CMakeFiles/utils.dir/src
 
+build CMakeFiles/utils.dir/src/camera.cpp.o: CXX_COMPILER__utils_unscanned_Debug /Users/bearkun/Desktop/Cpp-codes/OpenGL/src/camera.cpp || cmake_object_order_depends_target_utils
+  DEP_FILE = CMakeFiles/utils.dir/src/camera.cpp.o.d
+  FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.7 -fcolor-diagnostics
+  INCLUDES = -I/Users/bearkun/Desktop/Cpp-codes/OpenGL/glad/include -I/Users/bearkun/Desktop/Cpp-codes/OpenGL/glfw/include -I/Users/bearkun/Desktop/Cpp-codes/OpenGL/include -I/Users/bearkun/Desktop/Cpp-codes/OpenGL/glm/glm
+  OBJECT_DIR = CMakeFiles/utils.dir
+  OBJECT_FILE_DIR = CMakeFiles/utils.dir/src
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target utils
@@ -85,7 +92,7 @@ build CMakeFiles/utils.dir/src/vertex_array.cpp.o: CXX_COMPILER__utils_unscanned
 #############################################
 # Link the static library libutils.a
 
-build libutils.a: CXX_STATIC_LIBRARY_LINKER__utils_Debug CMakeFiles/utils.dir/src/shader.cpp.o CMakeFiles/utils.dir/src/texture.cpp.o CMakeFiles/utils.dir/src/init_window.cpp.o CMakeFiles/utils.dir/src/vertex_array.cpp.o
+build libutils.a: CXX_STATIC_LIBRARY_LINKER__utils_Debug CMakeFiles/utils.dir/src/shader.cpp.o CMakeFiles/utils.dir/src/texture.cpp.o CMakeFiles/utils.dir/src/init_window.cpp.o CMakeFiles/utils.dir/src/vertex_array.cpp.o CMakeFiles/utils.dir/src/camera.cpp.o
   ARCH_FLAGS = -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.7
   LANGUAGE_COMPILE_FLAGS = -g
   OBJECT_DIR = CMakeFiles/utils.dir

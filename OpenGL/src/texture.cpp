@@ -7,7 +7,6 @@ Texture::Texture(const char *path){
     glGenTextures(1, &id);
     index = id - 1;
 
-    glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D, id);
 
     unsigned char *data;
@@ -27,10 +26,14 @@ Texture::~Texture() {
 }
 
 void Texture::bind() const {
-    glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Texture::setParam(GLenum param, GLenum value) {
     glTexParameteri(GL_TEXTURE_2D, param, value);
+}
+
+void Texture::use() const{
+    glActiveTexture(GL_TEXTURE0 + index);
+    glBindTexture(GL_TEXTURE_2D, id);
 }
