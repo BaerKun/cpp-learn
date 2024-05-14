@@ -1,4 +1,4 @@
-# Install script for directory: /Users/bearkun/Desktop/Cpp-codes/OpenGL/glad
+# Install script for directory: /Users/bearkun/Desktop/codes/Cpp/OpenGL/glad
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

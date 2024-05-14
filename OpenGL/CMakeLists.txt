@@ -17,20 +17,18 @@ add_subdirectory(glfw)
 
 add_subdirectory(glm)
 
-add_library(utils STATIC
-        src/shader.cpp
-        src/texture.cpp
-        src/init_window.cpp
-        src/vertex_array.cpp
-        src/camera.cpp
-        include/camera.h)
+add_subdirectory(src)
+
+link_libraries(utils)
+
+link_libraries(glad)
+        
+link_libraries(glfw)
+
+link_libraries(glm)
 
 add_executable(OpenGL src/main.cpp)
 
-target_link_libraries(OpenGL utils)
+add_executable(FunctionDrawer src/function_drawer.cpp)
 
-target_link_libraries(OpenGL glad)
 
-target_link_libraries(OpenGL glfw)
-
-target_link_libraries(OpenGL glm)

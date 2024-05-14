@@ -9,6 +9,7 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 #include "camera.h"
+#include "function_image.hpp"
 
 int screenWidth = 800;
 int screenHeight = 600;
@@ -72,8 +73,9 @@ int main() {
 
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    ShaderProgram shaderProgram("../GLSL/vertshad1.vs",
-                                "../GLSL/frgshad1.fs");
+    ShaderProgram shaderProgram;
+    shaderProgram.load("../GLSL/vertshad1.vs",
+                        "../GLSL/frgshad1.fs");
 
     stbi_set_flip_vertically_on_load(true);
     Texture texture1("../imgs/awesomeface.png");
@@ -93,19 +95,17 @@ int main() {
     VertexArray::setVertexAttribute(0, 3, GL_FLOAT, 5 * sizeof(float), 0);
     VertexArray::setVertexAttribute(1, 2, GL_FLOAT, 5 * sizeof(float), 3 * sizeof(float));
 
-
-
     glm::mat4 transform;
     glm::mat4 model         = glm::mat4(1.0f);
-    glm::mat4 view          = glm::mat4(1.0f);
-    glm::mat4 projection    = glm::mat4(1.0f);
 
-//    view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-    projection = glm::perspective(glm::radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
+    camera.use();
+    camera.setProjection((float)screenWidth / screenHeight, 10.f);
 
     texture1.use();
     texture2.use();
     float r, g, b;
+
+    Function fun("x");
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -117,26 +117,28 @@ int main() {
 
         processInput(window);
 
-        r = (glm::sin(currentTime * 2.f + 1.f) + 1.0f) * .5f;
-        g = (glm::sin(currentTime * 2.f + 2.f) + 1.0f) * .5f;
-        b = (glm::sin(currentTime * 2.f + 3.f) + 1.0f) * .5f;
-
-        glClearColor(r, g, b, 1.0f);
+        glClearColor(1.f, 1.f, 1.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         model = glm::rotate(glm::mat4(1.f), glm::radians(50.f * currentTime), glm::vec3(0.5f, 1.0f, 0.0f));
-        view = camera.viewMatrix;
 
-        transform = projection * view * model;
+        transform = camera.getMatrix(true) * model;
 
         vao1.use();
 
-        shaderProgram.use();
+//        shaderProgram.use();
 
         shaderProgram.setUniformm("transform", glm::value_ptr(transform), 4);
 
-        VertexArray::drawArrays(GL_TRIANGLES, 36);
+//        VertexArray::drawArrays(GL_TRIANGLES, 36);
+
+        // 在渲染循环中停止使用着色器程序
+//        glUseProgram(0);
+
+        fun.draw();
+
+//        printf("%u ", CURRENT_SHADER_PROGRAM);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

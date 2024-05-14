@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glfw/install_manifest.txt")
-    message(FATAL_ERROR "Cannot find install manifest: \"/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glfw/install_manifest.txt\"")
+if (NOT EXISTS "/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glfw/install_manifest.txt")
+    message(FATAL_ERROR "Cannot find install manifest: \"/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glfw/install_manifest.txt\"")
 endif()
 
-file(READ "/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glfw/install_manifest.txt" files)
+file(READ "/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glfw/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

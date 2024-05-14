@@ -18,7 +18,7 @@ void VertexArray::use() const{
 void VertexArray::unuse() const {
     if(CURRENT_VAO == id) {
         glBindVertexArray(0);
-        CURRENT_VAO = id;
+        CURRENT_VAO = 0;
     }
 }
 

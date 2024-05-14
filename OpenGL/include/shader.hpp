@@ -4,13 +4,21 @@
 #include "glad/glad.h"
 #include "glm.hpp"
 
-class ShaderProgram {
-public:
-    GLuint id;
+extern GLuint CURRENT_SHADER_PROGRAM;
 
-    ShaderProgram(const char *vertex_path, const char *fragment_path);
+class ShaderProgram {
+private:
+    GLuint id;
+public:
+    ShaderProgram();
+
+    ShaderProgram(GLuint , GLuint );
 
     ~ShaderProgram();
+
+    void compile(const char *, const char *);
+
+    void load(const char *vertex_path, const char *fragment_path);
 
     void use() const;
 
@@ -18,9 +26,9 @@ public:
 
     void setUniform(const char *name, int value) const;
 
-    void setUniformv(const char *name, float *value, int count) const;
+    void setUniformv(const char *name, const float *value, int count) const;
 
-    void setUniformm(const char *name, float *value, int rowcols) const;
+    void setUniformm(const char *name, const float *value, int rowcols) const;
 };
 
 #endif //OPENGL_SHADER_HPP

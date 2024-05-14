@@ -1,4 +1,4 @@
-# Install script for directory: /Users/bearkun/Desktop/Cpp-codes/OpenGL
+# Install script for directory: /Users/bearkun/Desktop/codes/Cpp/OpenGL
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,17 +39,22 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glad/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glad/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glfw/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glfw/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glm/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glm/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/src/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -60,5 +65,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

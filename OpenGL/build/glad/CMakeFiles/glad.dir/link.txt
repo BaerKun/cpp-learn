@@ -1,0 +1,1 @@
+/usr/bin/clang -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.7 -dynamiclib -Wl,-headerpad_max_install_names -o libglad.dylib -install_name @rpath/libglad.dylib CMakeFiles/glad.dir/src/glad.c.o

@@ -1,4 +1,4 @@
-# Install script for directory: /Users/bearkun/Desktop/Cpp-codes/OpenGL/glm/test
+# Install script for directory: /Users/bearkun/Desktop/codes/Cpp/OpenGL/glm/test
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,10 +39,10 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glm/test/bug/cmake_install.cmake")
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glm/test/core/cmake_install.cmake")
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glm/test/gtc/cmake_install.cmake")
-  include("/Users/bearkun/Desktop/Cpp-codes/OpenGL/cmake-build-debug/glm/test/gtx/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glm/test/bug/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glm/test/core/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glm/test/gtc/cmake_install.cmake")
+  include("/Users/bearkun/Desktop/codes/Cpp/OpenGL/cmake-build-debug/glm/test/gtx/cmake_install.cmake")
 
 endif()
 

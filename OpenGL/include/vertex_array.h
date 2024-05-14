@@ -16,7 +16,7 @@ public:
 
     void unuse() const;
 
-    static void setVertexAttribute(int index, int count, GLenum type, int stride, int offset);
+    static void setVertexAttribute(int location, int count, GLenum type, int stride, int offset);
 
     static void drawArrays(GLenum mode, int count);
 
