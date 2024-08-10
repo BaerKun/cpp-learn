@@ -1,2 +1,0 @@
-/usr/bin/ar qc libutils.a CMakeFiles/utils.dir/shader.cpp.o CMakeFiles/utils.dir/texture.cpp.o CMakeFiles/utils.dir/init_window.cpp.o CMakeFiles/utils.dir/vertex_array.cpp.o CMakeFiles/utils.dir/camera.cpp.o CMakeFiles/utils.dir/function_image.cpp.o
-/usr/bin/ranlib libutils.a

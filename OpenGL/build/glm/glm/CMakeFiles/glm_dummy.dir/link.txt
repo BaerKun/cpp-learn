@@ -1,1 +1,0 @@
-/usr/bin/clang++ -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.7 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/glm_dummy.dir/detail/dummy.cpp.o CMakeFiles/glm_dummy.dir/detail/glm.cpp.o -o glm_dummy
