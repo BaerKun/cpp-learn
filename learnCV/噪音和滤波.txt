@@ -1,0 +1,97 @@
+卷积：
+    void filter2D(InArr src, OutArr dst, int ddepth, InArr kernel,
+        Point anchor=Point(-1, -1), double delta=0, int borderType=BORDER_DEFAULT);
+
+        - ddepth：输出矩阵的数据类型；-1则与输入相同
+        - kernel：CV_32FC1
+        - anchor：卷积核基准点（锚点）；默认是卷积核中心
+        - delta：输出偏移
+        - borderType：边界外推方法
+            // 输出和输入尺寸相同，默认使用外推
+
+
+随机数：
+    cvflann::seed_random(unsigned seed);
+
+    int cvflann::rand();
+
+    double cvflann::rand_double(double high=1.0, double low=0);
+
+    int cvflann::rand_int(int high=RAND_MAX, int low=0);
+
+    void cv::RNG::fill(InOutArr mat, int distType, InArr a, OutArr b, bool saturateRange=flase);
+        - mat：用于存放随机数；各个通道独立生成
+        - distType = RNG::UNIFORM（均匀分布） / NORMAL（高斯分布）
+        - a：下限（均匀）/ 均值（高斯）
+        - b：上限 / 标准差
+        - saturateRange：预饱和，即当输出值超过数据类型的范围时，取边界值
+        * 非静态，必须先创建RNG实例
+
+
+噪音：
+    椒盐噪音：图像像素随机地变成黑或白
+    高斯噪音：图像像素加上一个服从高斯分布的偏置
+
+
+滤波：
+    低通（高阻）滤波：允许低频信号通过，同时抑制或阻挡高频信号；
+        它的主要作用是平滑信号或图像，去除高频的噪声或细节。
+
+        线性滤波：
+            均值滤波（模糊）：
+                void blur(InArr src, OutArr dst, Size ksize,
+                    Point anchor=..., int borderType=...);
+                    - ksize：卷积核（滤波器）尺寸
+                    // 范围内像素均值代替原像素
+
+            方框滤波：
+                void boxFilter(InArr src, OutArr dst, int ddepth, Size ksize,
+                    Point anchor=..., bool normalize=true, int borderType=...)
+                    - normalize：归一化；
+                        true则和均值滤波相同；flase则只将范围内像素相加
+
+                void sqrBoxFilter(...);
+                    // 平方和
+
+            高斯滤波（=高斯模糊）：
+                void GaussianBlur(InArr src, OutArr dst, Size ksize,
+                    double sigmaX, double sigmaY=0, int borderType=...);
+                    - ksize：宽高必须是奇数或<=0；若<=，则根据sigmaXY计算
+                    - sigmaX/Y：x/y方向高斯分布的标准差
+                        若其中一个<=0，另一个>0，则都取>0的那个；
+                        若都<=0，则根据ksize计算
+
+                Mat getGaussianKernel(int ksize, double sigma, int ktype=CV_64F);
+                    - ktype = CV_32/64F
+                    // 计算一维高斯滤波器，参数与高斯滤波类似
+                    // 二维 = X * Y.T
+
+            可分离滤波：
+                // 所有二维滤波器都可以分离为x、y方向的一维滤波器
+                // 二维滤波可以等效为两次单方向滤波
+                void sepFilter2D(InArr src, OutArr dst, int ddepth,
+                    InArr kernelX, InArr kernelY, Point anchor=...,
+                    double delta=0, int borderType=...);
+                    // 等效于 Filter2D(..., kernel=kerelX * kernelY.t(), ...);
+
+        非线性滤波：
+            // 非固定滤波器；滤波器会随范围内像素值改变
+            中值滤波：
+                void medianBlur(InArr src, OutArr dst, int ksize);
+                    // 用滤波器范围内的像素中位数替代原像素
+
+            双边滤波：
+                void bilateralFilter(InArr src, OutArr dst, int d,
+                    double sigmaColor, double sigmaSpace, int borderType=...);
+                    // 滤波器权重由 空间和颜色 一起决定，在低通滤波的同时减少高频信号损失
+                    // 权重 W = Ws · Wc,
+                        Ws = Ks * GaussSpace(dist(p, q)) // 欧氏距离
+                        Wc = Kc * GaussColor(pixeldiff(p, q)) // 像素差
+                        分布由各自正态分布决定
+                    - d：领域直径，即滤波器（正方形）边长
+                    // d和sigmaSpace中若有一个<=0，则由另一个决定
+                    // 只能单或三通道
+
+    高通滤波：允许高频信号通过，同时抑制或阻挡低频信号；
+        它的主要作用是增强信号的变化部分，比如图像的边缘或音频中的突变。
+
