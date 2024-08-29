@@ -95,3 +95,56 @@
     高通滤波：允许高频信号通过，同时抑制或阻挡低频信号；
         它的主要作用是增强信号的变化部分，比如图像的边缘或音频中的突变。
 
+        // 通过计算像素差分判断边界
+        // 差分算子：一维或二维的矩阵
+        filter2D(src, dst, CV_16S, kernel);
+
+        void Sobel(InArr src, OutArr dst, int ddepth, int dx, int dy,
+            int ksize=3, double scale=1, double delta=0,
+            int borderType=...);
+            // x方向一阶Sobel算子 =  [[  -1,  0,  1  ]
+                                    [  -2,  0,  2  ]
+                                    [  -1,  0,  1  ]]
+            // y方向 = x方向.T
+            - dx/dy：x/y方向算子差分阶数
+            - ksize：算子尺寸，只能1、3、5、7；
+                    若1，则 1*3 或 3*1；
+                    一般ksize = 差分阶数 * 2 + 1
+
+        void Scharr(...); // 无ksize，其余以Sobel相同
+        // x方向Scharr算子 = [[ -3,   0,  3  ]
+                             [ -10,  0,  10 ]
+                             [ -3,   0,  3  ]]
+        - dx/dy：只能0/1，且dx + dy == 1
+
+        void getDerivKernels(OutArr kx, OutArr ky, int dx, int dy,
+            int ksize, bool normalize=false. int ktype=CV_32F);
+            - kx/ky：ksize * 1的滤波器
+            - ksize = 1、3、5、7、FILTER_SCHARR
+                若ksize == FILTER_SCHARR，则输出Scharr算子
+                否则Sobel算子
+
+        void Laplacian(InArr src, OutArr dst, int ddepth, int ksize=1,
+            double scale=1, double delta=0, int borderType=...);
+            // Laplactian = ddf/ddx + ddf/ddy（二阶偏导数相加）
+            - ksize：正奇数；若ksize == 1,
+                    则 kernel =  [[   0,  1,  0   ]
+                                  [   1,  -4, 1   ]
+                                  [   0,  1,  0   ]]
+                    否则 kernel =（x + y）方向二阶Sobel算子
+
+        Canny算法：
+            1.高斯滤波减少噪音
+            2.用Sobel计算梯度
+            3.非极大值抑制；p和其梯度正负方向的q、r，检查grad(p) > max(grad(q), grad(r))，否则抑制
+            4.用双阈值划分强、弱边缘；threshold1 >= 弱 > threshold2 >= 强
+            5.消除孤立边缘。在弱边缘8格领域中寻找强边缘，若无，则去除
+
+            void Canny(InArr image, OutArr edges,
+                double threshold1, double threshold2,
+                int apertureSize=3, bool L2gradient=false);
+                - image：必须CV_8UC1/3
+                - apertureSize：Sobel算子直径
+                - L2gradient：梯度值计算方法
+                    false: grad = abs(dI/dx) + abs(dI/dy)
+                    true: gead = sqrt((dI/dx)**2 + (dI/dx)**2)
