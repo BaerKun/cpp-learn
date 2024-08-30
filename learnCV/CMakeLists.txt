@@ -9,3 +9,5 @@ include_directories(${OpenCV_DIRS})
 link_libraries(${OpenCV_LIBS})
 
 add_executable(main main.cpp)
+
+add_library(somealg somealg.cpp)
