@@ -1,0 +1,139 @@
+# 形态学是图像处理中的一种技术，通过操作图像的几何结构来分析、修改和理解图像的形状和结构
+
+像素距离：
+    void distanceTransform(InArr src, OutArr dst, int distanceType,
+        int maskSize, int dstType=CV_32F);
+        //（近似）计算和最近的值为0的像素的距离
+        - src：必须CV_8UC1
+        - distancdType = DIST_
+                            L1      |dx|+|dy|
+                            L2      欧氏
+                            C       max(|dx|, |dy|)
+        - maskSize = 3 / 5
+        - dstType = CV_8U/32F
+
+    void distanceTransform(InArr, OutArr, OutArr labels, int, int,
+        int labelType=DIST_LABEL_CCOMP);
+        - labels：距离最近的0像素编号
+        - labelType = DIST_LABEL_
+                                CCOMP   同一个连通域的0像素的编号相同
+                                PIXEL   每个0像素独立编号
+        // 默认CV_32F输出
+
+    计算流程：
+        1.初始化：0像素距离值0
+        2.遍历每个像素p，更新距离值 = mask内最小距离值 + p到该像素的距离
+        3.左上到右下、右下到左上两次进行操作2
+
+连通域：
+    连通域是指：像素值相同且连通的区域
+    4-领域：上下左右
+    8-领域：+对角点
+
+    二次扫描法：
+        1.第一次扫描：只检测左、上（左上、右上），同时创建一个并查集储存labels
+        2.第二次：用并查集更新labels
+
+    种子填充法：
+        上下左右递归；深度搜索
+
+    int connectedComponents(InArr image, OutArr labels,
+        int connectivity=8, int ltype=CV_32S, int ccltype=CCL_DEFAULT);
+        - connectivity = 4/8（4-领域/8-领域）
+        - ltype = CV_32S/16U：输出数据类型
+        - ccltype = CCL_
+                        DEFAULT
+                        WU
+                        GRANA
+        // 返回连通域个数
+        // 只统计非0像素；0像素编号0，后从左上到右下1、2、3...
+
+    int connectedComponentsWithStats(InArr image, OutArr labels, OutArr stats,
+        OutArr centroids, int connectivity=8, int ltype=CV_32S, int ccltype=CCL_DEFAULT);
+        - stats：连通域状态（CV_32S）
+        - centroids：连通域质心坐标（CV_64F）
+        // stats.at<int>(label, CC_STAT_        )
+                                    0   LEFT    左边界
+                                    1   TOP     上边界
+                                    2   WIDTH   宽
+                                    3   HEIGHT  高
+                                    4   AREA    面积
+        // centroids.at<Point2d>(label);
+
+腐蚀：
+    图像中的一点p及其领域A，结构元素（模版）B，
+    p对应B的锚点，
+    只有当sum((A==p)&&(!B))==0，才保留p
+
+    Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1, -1));
+        - shape = MORPH_
+                        RECT        矩形
+                        CROSS       十字
+                        ELLIPSE     椭圆
+        - anchor：只影响十字的横纵交点
+        // 生成常用结构元素
+        *** CV_8U
+
+    void erode(InArr src, OutArr dst, InArr kernel, Point anchor=Point(-1, -1),
+        int iterations=1, int borderType=BORDER_CONSTANT,
+        const Scalar &borderValue=morphologyDefaultBorderValue());
+        - iterations：操作（腐蚀）次数
+
+膨胀：
+    A = p*(A||B);           // 用像素p的值填充
+    p = max(p1,p2,p3,...)   // 在所有刷新值中取最大
+
+    void dilate(...); // 同erode;
+
+开运算：
+    先腐蚀，再膨胀
+    去除较小连通域，保留较大连通域
+    消除噪音
+
+闭运算：
+    先膨胀，再腐蚀
+    填充小空洞，扩大连通域边界
+    平滑轮廓
+
+形态学梯度：
+    基本梯度：膨胀 - 腐蚀
+    内部梯度：原图 - 腐蚀
+    外表梯度：膨胀 - 原图
+    描述边界
+
+顶帽：
+    原图 - 开运算
+
+黑帽：
+    闭运算 - 原图
+
+击中击不中变换：
+    只有满足结构元素（0->忽略｜>0->>0｜<0->0）的p才被保留
+    强化的腐蚀；匹配模版
+
+通用函数：
+    void morphologyEx(InArr src, OutArr dst, int op, InArr kernel,
+        Point anchor=Point(-1, -1), int iteration=1,
+        int borderType=..., const Scalar &borderValue=...);
+        - op = MORPH_
+                    ERODE
+                    DILATE
+                    OPEN
+                    CLOSE
+                    GRADIENT    基本梯度
+                    TOPHAT
+                    BLACKHAT
+                    HITMISS     // 需要自己生成0/1/-1的模版
+
+图像细化：
+    缩减边缘直到一个像素但宽度
+    增加文字、几何图形的辨识度
+
+    #include "opencv2/ximgproc.hpp"
+
+    void cv::ximgproc::thinning(InArr src, OutArr dst,
+        int thinningType=THINNING_ZHANGSUEN);
+        - src：必须CV_8UC1
+        - thinningType = THINNING_
+                                ZHANGSUEN
+                                GUOHALL

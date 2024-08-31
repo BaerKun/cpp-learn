@@ -1,4 +1,4 @@
-#include "opencv2/opencv.hpp"
+#include "myalg.h"
 
 using namespace std;
 using namespace cv;
@@ -176,26 +176,28 @@ static void firstPass8(Mat &input, Mat &mat, vector<int32_t> &labelSet) {
     } while (iptr <= input.dataend);
 }
 
-static int32_t find(vector<int32_t> &set, int32_t x, int32_t &counter) {
-    if (set[x] > 0)
-        return set[x] = find(set, set[x], counter);
-    if (set[x] == 0) {
-        ++counter;
-        return set[x] = -counter;
+static void find(vector<int32_t> &set, int32_t x, int32_t &counter) {
+    int y = x;
+    while(set[y] > 0)
+        y = set[y];
+
+    if(set[y] == 0)
+        set[y] = -++counter;
+
+    int z = set[y];
+    while(x != z){
+        y = set[x];
+        set[x] = z;
+        x = y;
     }
-    return set[x];
+
 }
 
 static int32_t initlabel(vector<int32_t> &set) {
     int32_t counter = 0, size = (int32_t) set.size();
-    for (int y = 1; y != size; ++y) {
-        if (set[y] > 0)
-            set[y] = find(set, set[y], counter);
-        else if (set[y] == 0) {
-            ++counter;
-            set[y] = -counter;
-        }
-    }
+    for (int y = 1; y != size; ++y)
+        find(set, y, counter);
+
     for (int &y: set)
         y = -y;
     return counter;
@@ -214,8 +216,8 @@ static int32_t secondPass(Mat &mat, vector<int32_t> &labelSet) {
     return count;
 }
 
-int twoPass(Mat &image, Mat &label, int connectivity = 8, int labelType = CV_32S) {
-    Mat mat(image.rows + 2, image.cols + 2, CV_32S, Scalar(0));
+int twoPass(Mat &image, Mat &label, int connectivity, int labelType) {
+    Mat mat = Mat::zeros(image.rows + 2, image.cols + 2, CV_32S);
     vector<int32_t> labelSet;
 
     if (connectivity == 4)
