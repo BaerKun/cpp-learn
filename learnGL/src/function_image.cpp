@@ -13,7 +13,7 @@
 #define EXPRESSION_POSITION 134
 #define EXPRESSION_MAX_LENGTH 64
 
-char vertexTemplate[] = "#version 330 core "
+char vertexTemplate[] = "#version 330 core\n"
                       "layout (location = 0) in vec3 aPos;"
                       "uniform mat4 transform;"
                       "void main(){"
@@ -24,7 +24,7 @@ char vertexTemplate[] = "#version 330 core "
                       "gl_Position = transform * vec4(y, z, x, 1.0);"
                       "}";
 
-char fragmentSource[] = "#version 330 core "
+char fragmentSource[] = "#version 330 core\n"
                         "out vec4 FragColor;"
                         "uniform vec3 color;"
                         "void main(){"
@@ -69,13 +69,13 @@ static void loadExpression(const char *expression, unsigned length) {
 
 void init(){
     axesShaderProgram.compile(
-            "#version 330 core "
+            "#version 330 core\n"
             "layout (location = 0) in vec3 aPos;"
             "uniform mat4 transform;"
             "void main(){"
             "   gl_Position = transform * vec4(aPos, 1.f);"
             "}",
-            "#version 330 core "
+            "#version 330 core\n"
             "out vec4 FragColor;"
             "void main(){"
             "   FragColor = vec4(0.f, 0.f, 0.f, 1.f);"

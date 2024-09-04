@@ -25,12 +25,9 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 
 int main() {
-    GLFWwindow *window = initWindow(screenWidth, screenHeight, "OpenGL");
+    GLFWwindow *window = initWindow(screenWidth, screenHeight, "FunctionDrawer");
 
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-
-    glm::mat4 transform;
-    glm::mat4 model         = glm::mat4(1.0f);
 
     camera.use();
     camera.setProjection((float)screenWidth / (float)screenHeight, 10.f);
