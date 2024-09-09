@@ -1,0 +1,81 @@
+﻿深拷贝：
+void copyTo(InArr src, OutArr dst, InArr mask);
+
+连接：
+	横向：
+		void vconcat(InputArray, InputArray, OutputArray);
+		void vconcat(const Mat *src, size_t nsrc, OutputArray dst);
+		// 需要相同的宽度、通道数和数据类型
+
+	纵向：
+		void hconcat(...);
+				        (...);
+
+变换尺寸：
+	void resize(InputArray src, OutputArray dst, Size dsize,
+		double fx=0, double fy=0, int interpolation=INTER_LINEAR);
+		// fx, fy：x，y轴的缩放
+		// 两种方式使用其中一个，若有冲突，则使用dsize
+		// interpolation：插值方法 = INTER_
+					NEAREST
+					LINEAR
+					CUBIC
+					AREA
+					LANCZOS4
+					LINEAR_EXACT
+					MAX
+
+翻转：
+	void flip(InArr src, OutArr dst, int flipCode);
+		// flipCode > 0，y轴翻转；
+				== 0，x轴翻转；
+				< 0，x、y轴翻转
+
+仿射变换：
+	旋转：
+		Mat getRotationMatrix2D(Point2f center, double angle, double scale);
+			// 旋转中心；旋转角度（逆时针、角度）；放缩比例
+
+	通用：
+		Mat getAffineTransform(const Point2f src[], const Point2f dst[]);
+			// 原图3点；变换后3点
+
+	// 两者输出矩阵格式：[A, B]：矩阵A和向量B
+					[[A00, A01, B0],
+					 [A10, A11, B1]]
+	变换：
+		void warpAffine(InArr src, OutArr dst, InArr M, Size dsize,
+			int flags=INTER_LINEAR, int borderMode=BORDER_CONSTANT,
+			const Scalar &borderValue=Scalar());
+			// M：变换矩阵 [2 * 3]
+			// dsize：输出图像尺寸
+			// flags = INTER_... | WARP_
+								FILL_OUTLIERS
+								INVERSE_MAP		取M的逆
+			// borderMode = BORDER_
+							CONSTANT	borderValue填充
+							REPLICATE	两段复制 aaa|abc|ccc
+							REFLECT		倒序 cba|abc|cba
+							WRAP		正序 abc|abc|abc
+							DEFAULT		除边界倒序 dcb|abcd|cba
+							TRANSPAPENT
+							ISOLATED
+			// (X', Y') = A * (X, Y) + B
+
+透视变换：
+	Mat getPerspectiveTransform(const Point2f src[], const Point2f dst[],
+			int solveMethod=DECOMP_LU);
+		// 原图4点；变换后4点；计算方法
+		// solveMethod = DECOMP_
+					LU/SVD/EIG/CHOLESKY/QR/NORMAL
+		// 可能不存在透视矩阵
+		// 输出：3 * 3
+
+	void warpPerspective(... /* 同仿射变换 */);
+
+极坐标变换：
+	void warpPolar(InArr src, OutArr dst, Size dsize, Point2f center, double maxRadius, int flags);
+		// flags = INTER_... | WARP_
+						POLAR_LINEAR	极坐标变换
+						POLAR_LOG		半对数极坐标变换 (r -> ln(r))
+						INVERSE_MAP		逆变换

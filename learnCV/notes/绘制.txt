@@ -1,0 +1,67 @@
+﻿圆：
+	void circle(InOutArr img, Point center, int radius, const Scalar &color,
+		int thickness=1, int lineType=LINE_8, int shift=0);
+		// thickness：边界宽度；如果为负，则填充
+		// shift：将center和radius以浮点数除以1 << shift，来提高精度
+		// lineType = LINE_
+					4		上下左右4个像素
+					8		周围8个像素
+					AA		抗锯齿
+
+直线：
+	void line(InOutArr img, Point pt1, Point pt2, const Scalar &color,
+		int thickness=1, int lineType=LINE_8, int shift=0);
+
+椭圆：
+	void ellipse(InOutArr img, Point center, Size axes, double angle,
+		double startAngle, double endAngle, const Scalar &color,
+		int, int, int);
+		// axes：半长轴，半短轴
+		// angle：椭圆旋转角度
+		// 都是顺时针
+
+	void eillpse2Poly(Point center, Size axes, int angle, int arcStart, int arcEnd, int delta,
+		std::vector<Point> &pts);
+		// 只返回描绘点的坐标
+		// delta：相邻点之间的差角
+
+矩形：
+	void rectangle(InOutArr img, Point pt1, Point pt2, const Scalar &color,
+		int, int, int);
+		// 对角点
+
+	void rectangle(InOutArr img, Rect rec, const Scalar &color, int, int, int);
+		// 左上点，宽，高
+
+多边形：
+	void polylines(InOutArr img, const Point **pts, const int *npts, int ncontours, bool isClosed,
+		const Scalar &color, int thickness=1, int lineType=LINE_8, int shift=0);
+		// 只画边界
+		// isClosed：是否闭合
+		// thickness不能为负
+
+	void fillPoly(InOutArr img, const Point **pts, const int *npts, int ncontours,
+		const Scalar &color, int lineType=LINE_8, int shift=0, Point offset=Point());
+		// 只填充
+		// offset：对多边形的偏移 (x, y) + offset
+
+		// 每个多边形的点，每个多边形的点数，多边形数
+
+文字：
+	void putText(InOutArr img, const String &text, Point org, int fontFace, double fontScalar,
+		Scalar color, int thickness=1, int lineType=LINE_8, bool bottomLeftOrigin=false);
+		// 只支持英文
+		// org：左下角
+		// fontScale：字体大小（比例）
+		// bottemLeftOrigin：是否把文字倒过来
+		// fontFace = FONT_
+				HERSHEY_
+					SIMPLEX				大；无衬线
+					PLAIN				小；无衬线
+					DUPLEX				大；复杂；无衬线
+					COMPLEX			大；衬线
+					TRIPLEX				大；复杂；衬线
+					COMPLEX_SMALL		小；衬线
+					SCRIPT_SIMPLEX		手写风格
+					SCRIPT_COMPLEX		复杂；手写风格
+			|	ITALIC					斜体

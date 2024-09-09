@@ -1,0 +1,150 @@
+﻿图片：
+Mat imread(const String &filename, int flags=IMREAD_COLOR);
+
+	flags =
+		IMREAD_
+				UNCHANGED：原样，保留alpha
+				GRAYSCALE：转单通道灰度图
+				COLOR：rgb
+				ANYDEPTH：保留深度
+				ANYCOLOR
+				LOAD_GDAL
+				REDUCED_GRAYSCALE_2/4/8：转单灰，并缩小至2/4/8分之一
+						      COLOR_2/4/8：rgb，并缩小
+				IGNORE_ORIENTATION
+
+	// 不同标志在不冲突情况下可以用 | 隔开
+	*** 默认加载为BGR/BGRA ***
+
+
+bool imwrite(const String &filename, InputArray img,
+			const std::vector<int> &params=std::vector<int>())
+
+	// 保存图片。成功则返回true
+	// 默认只保存为8UC1，8UC3
+	// 自动转换 8U: BGR(A) -> RGB(A)
+
+	params.push_back(参数)
+	// params.push_back(值) 如果需要
+		IMWRITE_							范围		默认
+				JPEG_QUALITY			0~100	95
+					    PROGRESSIVE		0/1		0
+					    OPTIMIZE			0/1		0
+					    LUMA_QUALITY		0~100	0
+					    CHPOMA_QUALITY	0~100	0
+				PNG_COMPRESSION		0~9		1
+				TIFF_COMPRESSION		/		/
+
+视频：
+
+VideoCapture:
+// 读取
+
+实例化：
+	VideoCapture();
+	VideoCapture(const String &filename, int apiPreference=CAP_ANY);
+		// 也可以读取图片序列，用 %... (c风格)
+		// 如 "img_%02.jpg"
+
+	VideoCapture(int index, int apiPreference=CAP_ANY);
+		// 打开摄像头
+
+	bool open(...);
+
+获取属性：
+
+	bool isOpened();
+
+	double get(int propId);
+
+		propId =
+			CAP_PROP_
+					POS_MSEC		当前图片在视频中时间（ms）
+					FRAME_WIDTH	宽
+					FRAME_HEIGHT	高
+					FPS				帧率
+					FOURCC			编解码器
+					FRAME_COUNT	帧数
+					FORMAT			Mat格式
+			// 以下仅适用于支持相关参数的相机
+					BRIGHTNESS		亮度
+					CONTRAST		对比度
+					SAYURATION		饱和度
+					HUE				色调
+					GAIN				增益
+
+拆分：
+	>>
+		// videoCapture >> mat;
+		// 流（队列）
+
+	bool read(InputArray img);
+		// 作用同 >>，但增加判断是否成功
+
+释放：
+	release();
+
+
+VideoWriter:
+// 保存
+
+实例化：
+	VideoWriter();
+	VideoWriter(const String &filename, int fourcc, double fps, Size frameSize, bool isColor=true);
+		// fourcc：编码器；-1 -> 自动
+		// VideoWriter::fourcc(char, char, char, char)
+
+	bool open(...);
+
+写入：
+	<<
+
+	bool write(InputArray img);
+
+释放：
+	release();
+
+
+XML和YMAL文件：
+
+XML：用 <arg> value [, value2, ...] </arg> 表示变量的从属关系
+
+YMAL：
+	arg:
+		- arg1: {1, 2, 3, ...}
+		- arg2: ...
+
+FileStorage:
+
+	FileStorage();
+	FileStorage(const String &filename, int flags, const String &encodong=String());
+		// flags=
+				READ, WRITE
+				APPEND：尾续
+				MEMORY：在缓冲区读写
+
+	bool open(...);
+
+	bool isOpened();
+
+写入：
+
+	void write(const String &name, type val);
+		// type = int, double, String, Mat, vector<String>
+
+	file << "arg" << value << ... ;
+	file << "{" << "[" << value << ... << "]" << "}";
+
+		// 在opencv中统一用{ }表示从属，用[ ]表示序列
+		// 一个变量对应一个值
+
+读取：
+
+	FileNode fn = file["arg"];
+
+	fn >> arg;			// 单变量
+	arg = fn["arg"];		// 从属
+	arg1 = fn[1];		// 系列或从属
+
+	FileNodeIterator it = fn.begin();
+	FileNodeIterator end = fn.end();

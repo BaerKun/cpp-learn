@@ -1,0 +1,90 @@
+图像直方图：
+	# 统计图像像素值出现的次数
+	void calcHist(const Mat *images, int nimages, const int *channels, InArr mask, OutArr hist, int dims, const int *histSize, const float **ranges, bool uniform=true, bool accumulate=false);
+	// images：尺寸和数据类型须相同，且须是CV_8U/CV_16U/CV_32F
+	// nimages：images的个数
+	// channels：要统计的通道
+		通道索引： [0, images[0] + images[1] + ... - 1]
+	// mask：要统计的图像的区域，必须CV_8U
+	// hist：输出的直方图（特殊的矩阵）
+		* channels() = 1; rows = cols = -1; type() = CV_32F;
+		* 访问：hist.at<float>(c0, c1, c2, ...)
+			像素组合 (c0, c1, c2, ...) 的个数
+	// dims：hist的维度数，即channels的元素个数
+	// histSize：直方图每个维度的统计分区个数
+	// ranges：每个维度对应通道的像素值的取值范围
+		# 默认每个分区的大小及(ranges[1] - ranges[0]) / histSize
+	// uniform：直方图的分区大小是否均匀；false则要在ranges中指定...
+	// accumulate：是否累加；
+		即 hist.at<float>(...) += ###;
+		false则 hist.at<float>(...) = ###;
+
+
+归一化：
+	void normalize(InArr src, InOutArr dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, InOutArr mask=noArray());
+	// alpha：除 NORM_MINMAX 外，输出 *= alpha
+	// beta：只在NORM_MINMAX，和alpha中的大者做MAX，小者作MIN
+	// dtype：dst的数据类型，负数则与src相同；通道数不变
+	// norm_type = NORM_
+		INF			pixel *= alpha / max
+		L1			L1 = sum(abs(pixels)); pixel *= alpha / L1 
+		L2			L2 = sqart(sum(pixels ** 2)); ...
+		MINMAX		pixel = MIN + (pixel - MIN) / (MAX - MIN)
+
+直方图比较：
+	double compareHist(InArr H1, InArr H2, int method);
+	
+	// method = HISTCMP_
+		CORREL				相关法
+		CHISQR				卡方法
+		INTERSECT			直方图相交法
+		BHATTACHARYYA		巴氏距离法
+		HELLINGER			与巴氏距离法相同
+		CHISQR_ALT			替代卡方法
+		KL_DIV				相对商法（Kullback-Leibler散度法）
+		
+		
+直方图均衡化：
+	void equalizeHist(InArr src, OutArr dst);
+	// 均匀图像的直方图发布，提高对比度
+	// 只支持 CV_8UC1
+	
+
+直方图匹配：
+	# 将图像的直方图，通过映射，变换（趋近）到指定（图像的）直方图
+	# 映射方法（单通道）：
+		原图直方图某一像素值的累积概率 P1（ <= 该像素值的概率）
+		目标直方图所有像素值的累积概率 P2[n]
+		则该像素的映射值为 k: abs(P1-P2[k]) = min(abs(P1-P2[i]))
+		
+	# opencv中没有直接实现此功能的函数；可以使用 LUT查找表   
+	
+	
+直方图反向投影：
+	# 取图像局部的直方图，匹配目标直方图，寻找与其相似的区域
+	
+	void calcBackProject(const Mat *images, int nimages, const int *channels, InArr hist, OutArr backProject, const float **ranges, double scale=1, bool uniform=true);
+	// 大部分参数和calcHist类似，针对images,目标直方图hist,输出backProject
+	// backProject：和 images 中图像的尺寸和数据类型相同的单通道灰度图
+					图像中的区域的亮度越高，匹配度越高
+	// scale：backProject *= scale
+	
+	// 通常使用 GRAY 或 HSV的HS通道 作直方图
+
+
+模板匹配：
+	# 逐个像素比较，匹配
+	
+	void matchTemplate(InArr image, InArr templ, OutArr result, int method, InArr mask=noArray());
+	// image：数据类型必须是CV_8U/CV_32F；
+			通道数为1/3；若3,则在函数中转化为GRAY
+	// templ：尺寸 <= image.size；
+			数据类型和通道数必须和image相同
+	// result：尺寸 = image.size - templ.size + 1
+			且为 CV_32FC1
+			计算过程和卷积类似
+	// method = TM_
+		SQDIEF			平方差
+		CCORR			相关
+		CCOEFF			系数
+			_NORMED		以上三种的归一化，结果都 <= 1

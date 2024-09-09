@@ -6,9 +6,9 @@ using namespace cv;
 unsigned cvflannSeed = time(nullptr);
 
 // only CV_8UC1/3/4
-void saltAndPepperNoise(Mat &mat, double ratio) {
+void saltAndPepperNoise(const Mat &mat, const double ratio) {
     double mask;
-    unsigned channels = mat.channels();
+    const int channels = mat.channels();
     uchar *dataptr = mat.data;
     uchar iswhite;
 
@@ -38,14 +38,14 @@ void saltAndPepperNoise(Mat &mat, double ratio) {
 }
 
 // no alpha
-void GaussianNoise(Mat &mat, double mean, double std) {
+void GaussianNoise(Mat &mat, const double mean, const double std) {
     Mat noise(mat.size(), mat.type());
     RNG().fill(noise, RNG::NORMAL, mean, std);
 
     mat += noise;
 }
 
-static inline int getlabel(vector<int> &set, int32_t x, int32_t y) {
+static inline int getlabel(vector<int> &set, const int32_t x, const int32_t y) {
     if (x < y) {
         set[y] = x;
         return x;
@@ -55,11 +55,12 @@ static inline int getlabel(vector<int> &set, int32_t x, int32_t y) {
     return y;
 }
 
-static void firstPass4(Mat &input, Mat &mat, vector<int32_t> &labelSet) {
-    uint8_t *iptr = input.data,
+static void firstPass4(const Mat &input, Mat &mat, vector<int32_t> &labelSet) {
+    const uint8_t *iptr = input.data,
             *ileftptr = iptr - 1,
             *itopptr = iptr - input.cols;
-    int32_t *optr = mat.ptr<int32_t>(1, 1),
+    auto *optr = mat.ptr<int32_t>(1, 1);
+    const int32_t
             *oleftptr = optr - 1,
             *otopptr = optr - mat.cols,
             *colend = optr + input.cols - 1;
@@ -81,6 +82,7 @@ static void firstPass4(Mat &input, Mat &mat, vector<int32_t> &labelSet) {
                     break;
                 case 2:
                     *optr = *otopptr;
+                default:
                     break;
             }
         }
@@ -100,13 +102,14 @@ static void firstPass4(Mat &input, Mat &mat, vector<int32_t> &labelSet) {
     } while (iptr <= input.dataend);
 }
 
-static void firstPass8(Mat &input, Mat &mat, vector<int32_t> &labelSet) {
-    uint8_t *iptr = input.data,
+static void firstPass8(const Mat &input, Mat &mat, vector<int32_t> &labelSet) {
+    const uint8_t *iptr = input.data,
             *ileftptr = iptr - 1,
             *itopptr = iptr - input.cols,
             *ilefttopptr = itopptr - 1,
             *irighttopptr = itopptr + 1;
-    int32_t *optr = mat.ptr<int32_t>(1, 1),
+    auto *optr = mat.ptr<int32_t>(1, 1);
+    const int32_t
             *oleftptr = optr - 1,
             *otopptr = optr - mat.cols,
             *olefttopptr = otopptr - 1,
@@ -151,6 +154,7 @@ static void firstPass8(Mat &input, Mat &mat, vector<int32_t> &labelSet) {
                     break;
                 case 10:
                     *optr = getlabel(labelSet, *olefttopptr, *orighttopptr);
+                default:
                     break;
             }
         }
@@ -184,7 +188,7 @@ static void find(vector<int32_t> &set, int32_t x, int32_t &counter) {
     if(set[y] == 0)
         set[y] = -++counter;
 
-    int z = set[y];
+    const int z = set[y];
     while(x != z){
         y = set[x];
         set[x] = z;
@@ -207,7 +211,7 @@ static int32_t secondPass(Mat &mat, vector<int32_t> &labelSet) {
     auto *ptr = mat.ptr<uint16_t>(1, 1);
     const uint16_t *ptrend = mat.ptr<uint16_t>(mat.rows - 2, mat.cols - 2);
 
-    int count = initlabel(labelSet);
+    const int count = initlabel(labelSet);
     do {
         if (*ptr != 0)
             *ptr = labelSet[*ptr];
@@ -216,7 +220,7 @@ static int32_t secondPass(Mat &mat, vector<int32_t> &labelSet) {
     return count;
 }
 
-int twoPass(Mat &image, Mat &label, int connectivity, int labelType) {
+int twoPass(const Mat &image, Mat &label, const int connectivity, const int labelType) {
     Mat mat = Mat::zeros(image.rows + 2, image.cols + 2, CV_32S);
     vector<int32_t> labelSet;
 
@@ -224,8 +228,89 @@ int twoPass(Mat &image, Mat &label, int connectivity, int labelType) {
         firstPass4(image, mat, labelSet);
     else
         firstPass8(image, mat, labelSet);
-    int count = secondPass(mat, labelSet);
+    const int count = secondPass(mat, labelSet);
 
     mat(Rect(1, 1, image.cols, image.rows)).convertTo(label, labelType);
     return count;
 }
+
+void hist2img1D(const Mat &hist, Mat &img, const int width, const int height) {
+    img = Mat::zeros(height, width, CV_8U);
+    const int npoints = hist.rows;
+    float x=0.f;
+    const float deltaX = (float)width / npoints,
+    *pVal = hist.ptr<float>();
+    Point lefttop(0, 0);
+    Point rightbottom(0, 0);
+    const Scalar color(255);
+
+    for(int p = 0; p < npoints; ++p) {
+        lefttop.x = x;
+        rightbottom.x = x += deltaX;
+        rightbottom.y = height * *pVal++;
+        rectangle(img, lefttop, rightbottom, color, -1);
+    }
+    flip(img, img, 0);
+}
+
+void hist2img2D(const Mat &hist, Mat &img, const int width, const int height, const double brigtnessHance=10.) {
+    img = Mat::ones(height, width, CV_8U);
+    const int npointsX = hist.cols,
+    npointsY = hist.rows;
+    float x, y=0.f;
+    const float
+    deltaX = (float)width / npointsX,
+    deltaY = (float)height / npointsY,
+    *pHistVal = hist.ptr<float>(0, 0);
+    Point lefttop(0, 0), rightbottom(0, 0);
+    Scalar color(255.0);
+
+    int r, c;
+    for(r = 0; r < npointsY; ++r) {
+        x = 0.f;
+        lefttop.y = y;
+        rightbottom.y = y += deltaY;
+        for(c = 0; c < npointsX; ++c) {
+            lefttop.x = x;
+            rightbottom.x = x += deltaX;
+            *color.val = *pHistVal++ * 255.0 * brigtnessHance;
+            rectangle(img, lefttop, rightbottom, color, -1);
+        }
+    }
+    flip(img, img, 0);
+}
+
+void histMatch(const Mat &src, const Mat &hist, Mat &dst) {
+    Mat srcHist;
+    constexpr int channels = 0, histSize = 256;
+    constexpr float range[] = {0.f, 256.f};
+    const float *ranges[] = {range};
+
+    calcHist(&src, 1, &channels, noArray(), srcHist, 1, &histSize, ranges);
+    normalize(srcHist, srcHist, 1.0, 0.0, NORM_L1);
+
+    Mat lut(1, 256, CV_8UC1);
+    auto *pLutVal = lut.ptr<uchar>(0);
+    const float
+    *pSrcVal = srcHist.ptr<float>(0),
+    *pTarVal = hist.ptr<float>(0);
+    float
+    mapVal = 0.f,
+    ssum = *pSrcVal,
+    dsum = *pTarVal;
+
+    for (int i = 0; i < 256; ) {
+        if (ssum > dsum) {
+            dsum += *++pTarVal;
+            mapVal += 1.f;
+            if (ssum > dsum + *(pTarVal + 1))
+                continue;
+        }
+        *pLutVal++ = mapVal;
+        ssum += *++pSrcVal;
+        ++i;
+    }
+
+    LUT(src, lut, dst);
+}
+

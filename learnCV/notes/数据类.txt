@@ -1,0 +1,128 @@
+﻿// namespace cv
+
+Mat Mat_(...);
+	// 函数化，参数和类的实例化相同
+
+class Mat:
+	// 分为 矩阵头：储存矩阵属性；数据指针
+	// 除了clone()，其余都是浅拷贝
+	// 记录指向数据的Mat数，当其为0时，自动释放数据
+
+属性：
+	int rows				行元素数
+	int cols				列元素数
+		*** if(dims > 2) rows = cols = -1; ***
+	int total()				总元素数
+	int channels()			通道数
+	uchar *data				数据指针
+	int step / step[0]		行偏移（B）
+	int step[1]				列偏移（B）
+	int elemSize()			元素大小（B）
+	int dims				维度数；* 除了channels
+	Size size				各维度的元素个数
+
+实例化：
+	Mat();
+	Mat(int rows, int cols, int type);
+	Mat(Size size, int type);
+	Mat(const Mat &m);
+	Mat(const Mat &m, const Range &rowRange, const Range &colRange=Range::all());
+	Mat(const Mat &m, const Rect &roi);
+	// 截取/ROI
+	Mat(int rows, int cols, int type, const Scalar &s);
+	// 初始化的mat的每个元素赋 s 中的初值
+	// 多去，少0
+	Mat(int rows, int cols, int type, void *data);
+	// 以data中数据赋初值
+
+	eye(int rows, int cols, int type);
+	// 单位矩阵
+	zoros(...);
+	ones(...);
+
+赋值：
+	mat2 = mat1;
+	mat = (Mat_(...) << 1, 2, 3, ...);
+	mat = Scalar(...);
+
+	Mat clone();
+		// 复制一份数据，矩阵头除了数据指针，都一样
+
+	void copyTo(OutArr m);
+			(OutArr m, InArr mask);
+		// 尺寸、类型一致
+
+	// 凡是赋值=Mat类型，都是浅拷贝
+	// 否则是直接改变data
+
+计算：
+	+ - * /
+	1. 对于矩阵mat1与常数
+		返回与mat1属性相同的mat2
+
+	2. 对于矩阵之间mat1, mat2
+		mat1和mat2的属性必须完全相同
+		包括行、列数，通道数和数据类型（*** 不会有任何的隐式转换）
+		// *	 是矩阵乘法
+			***** 矩阵type必须是 CV_32FC1, CV_32FC2,
+				 CV_64FC1, CV_64FC2 这4个中的其中一个
+			*****
+
+	double dot(Mat, Mat);
+	// 展开成一维（向量），计算点乘
+
+	Mat mul(Mat);
+	// 逐个数据做乘法
+
+	// 计算过程中，若结果超出数据类型范围，会取边界值；而非溢出
+
+访问元素：
+	type at<type>(int row=0, int col=0);
+	// ((type *)(m.data + m.step[0] * row))[col]
+
+	type *ptr<type>(...);
+	// &at<...>(...)
+
+	MatIterator_<type> begin<type>();
+	MatIterator_<type> end<type>();
+	// 迭代器，用法和指针差不多
+
+方法：
+
+数据类型转换：
+	void convertTo(OutputArray m, int rtype, double alpha=1, double beta=0);
+		y = (type)(alpha * x + beta)
+
+		rtype = CV_8U等
+
+修改通道数：
+	Mat reshape(int cn, int rows=0);
+		// cn：输出通道数
+		// rows；输出行数（默认与原矩阵不变）
+
+重载：
+	Mat operator()(const Rect &roi);
+				(Range rowRange, Range colRange);
+		// 截取；浅拷贝
+
+Vec:
+	...
+
+Size:
+	Size Size();
+		// 返回Size(size[0], [1])
+
+Rect:
+	Rect(Tp x, Tp y, Tp width, Tp height);
+	// 左上，宽，高
+
+Range:
+	Range(int start, int end);
+
+Scalar:
+	Scalar();
+	[0], [1], [2], [3]
+
+Point:
+	Point(...);
+	x, y, z

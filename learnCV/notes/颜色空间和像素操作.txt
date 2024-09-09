@@ -1,0 +1,142 @@
+﻿颜色空间
+
+***
+	opencv 默认使用BGR(A)
+	但实际并不保存颜色空间
+	颜色空间之间的转换全靠数值间的联系
+***
+
+对于8U和16U，各个通道的值都可以被映射到 0 ～ MAX
+	8U: MAX = 255
+	16U: MAX = 0xFFFFFFFF
+
+RGB/BGR：
+	red, green, blue
+
+RGBA/BGRA：
+	..., alpha
+
+YUV：
+	// 兼容灰度，附加颜色
+
+	Y：亮度		// GRAY
+	U：色度·蓝
+	V：色度·红
+
+	Y = 0.299R + 0.587G + 0.114B
+	U = 0.492 * (B - Y)
+	      = -0.147R - 0.289G + 0.436B
+	V = 0.877 * (R - Y)
+	      = 0.615R - 0.515G - 0.100B
+
+	// U、V的原值有正负，为了与Y统一，会 + 偏移（如 128，在8U）
+	// V 的值可能会超出范围，在8U /16U取边界值，在32F不做操作
+
+	R = Y + 1.14V
+	G = Y - 0.39U - 0.58V
+	B = Y + 2.03U
+
+HSV：
+	Hue：色度
+	Saturation：饱和度
+	Value：亮度
+
+	8U: H: 0 ~ 179
+	// 不支持16U
+	32F: 0 ~ 360
+
+	S, V: 0 ~ MAX        <-        0 ~ 1
+
+Lab：
+	Luminosity：亮度
+	a, b：两个颜色通道
+
+	L：0 ~ MAX        <-        32F：0 ~ 100.f
+	a：0 ~ MAX        <-        绿 -128.f ~ 127.f 红
+	b：0 ~ MAX        <-        蓝 -128.f ~ 127.f 黄
+
+GRAY:
+	// 单通道灰度
+	GRAY = 0.3R + 0.59G + 0.11B
+
+颜色空间转换：
+	void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0);
+		dstCn：src通道数，默认自动获取
+		code：转换标志
+			= COLOR_XXX2XXX
+				如：    BGR2BGRA, BGR2RGB, BGR2YUV
+
+		***
+			若src和dst储存的数据类型不同
+			则将src的强制转换到与dst相同
+			中间不会映射
+		***
+
+通道合并：
+	void split(const Mat &src, Mat *mvbegin);
+	void split(InputArray m, OutputArrayOfArrays mv);
+
+	// 分离为单个通道
+	// 分为数值输出和vector(OutputArrayOfArrays)输出
+
+合并：
+	void merge(const Mat *mv, size_t count, OutputArray dst);
+	void merge(InputArrayOfArrays mv, OutputArray dst);
+
+	// 需要数据类型和尺寸相同
+	// 不必是单通道
+
+最大最小值：
+	void minMaxLoc(InputArray src, double *minVal, double *maxVal=0,
+				Point *minLoc=0, Point *maxLoc=0, InputArray mask=noArray());
+		// mask：掩模
+			if (mask.at<...>(i, j) != 0){/* 计算在内 */}
+
+平均值和标准差：
+	Scalar mean(InputArray src, InputArray mask=noArray());
+		// Scalar[n], n = 0, 1, 2, 3；超出src通道数的值为0
+
+	void meanStdDev(InputArray src, OutputArray mean,
+					OutputArray stddev, IntputArray mask=noArray());
+
+图像逻辑和位运算：
+	void max(InputArray, IntputArray, OutputArray);
+		min(...);
+
+		bitwise_and(InputArray, InputArray, OutputArray, InputArray mask=noArray());
+		bitwise_or(...);
+		bitwise_xor(...);
+		bitwise_not(InputArray, OutputArray, InputArray);
+
+	// 不限制数据类型，即使是浮点数
+
+二值化：
+	double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type);
+		// 只能 CV_8U / CV_32F
+		// thresh：阈值
+		// type = THRESH_			< thresh		> thresh
+				BINARY			0			maxval
+				BINARY_INV		maxval		0
+				TRUNC			不变			thresh
+				TOZERO			0			不变
+				TOZERO_INV		不变			0
+
+				// 自动寻找阈值，需要与其他标志进行 | 运算
+				OTSU			大律法
+				TRIANGLE		三角形法	
+
+	void adaptiveThreshold(InputArray src, OutputArray dst, double maxValue,
+		int adaptiveMethod, int thresoldType, int blockSize, double C);
+		// 只能CV_8UC1
+		// 局部(blockSize * blockSize，一般取奇数)自适应取阈值
+		// adaptiveMethod = ADAPTIVE_THRESH_
+							MEAN_C		均值法
+							GAUSSIAN_C	高斯法
+		// thresoldType = THRESH_BINARY(_INV)
+		// thresh = adaptive_thresh - C
+
+显示查找表（Look-Up-Table)
+	void LUT(InputArray src, InputArray lut, OutputArray dst);
+		// 只能 8U
+		// lut 要么只有一个通道，要么和src一样，cols=256
+		// dst.at = lut.at(src.at)

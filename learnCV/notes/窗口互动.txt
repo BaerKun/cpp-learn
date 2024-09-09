@@ -1,0 +1,65 @@
+void namedWindow(const String &winname, int flags=WINDOW_AUTOSIZE);
+
+	flags =
+		WINDOW_
+			*	NORMAL：允许用户调整大小
+				AUTOSIZE：不允许调整大小
+				OPENGL：支持openGL
+				FREERATIO：调整图像充满屏幕
+			*	KEEPRATIO：保持图像比例
+			*	GUI_EXPANDED：允许添加工具栏和状态栏
+					NORMAL：不允许～
+
+	// |
+	// *注，三个选项的值实际上是一样的
+	// 在不同平台的实现效果不同，可能无法实现～
+	// 如果之前已经创建了同名窗口，那么什么也不做
+
+void destroyWindow(const String &winname);
+
+void destroyAllWindows();
+
+void imshow(const String &winname, InputArray mat);
+
+	// 如果mat数据类型是16/32位整数，则作除法映射到0～255
+	// 若是浮点数，则乘以255，0～1 -> 0～255
+
+	// InputArray只作说明，实际就是Mat
+	// 如果没有同名窗口，则以默认flag创建
+	// 以BGR显示
+
+waitKey(int delay);
+
+	// 等待键盘输入，至多delay（ms）
+	// 如果delay == 0，则没有时间限制
+	// 如果没有等待输入，窗口会立刻关闭
+
+﻿滑动条：
+	int createTrackbar(const String &trackbarname, const String &winname,
+		int *value, int count, TackbarCallback onChange=0, void *userdata=0);
+		// value：滑动条要改变的值，只能int
+		// count：value的最大值
+		// userdata：要传入onCange的其他值
+		// TackbarCallback	:	void (*)(int value, void *userdata)
+
+鼠标：
+	void setMouseCallback(const String &winname, MouseCallback onMouse, void *userdata=0);
+
+	void (* MouseCallback)(int event, int x, int y, int flags, void *userdata);
+		// x，y：鼠标位置
+		// event = EVENT_
+					MOUSEMOVE				移动
+					L/M/R BUTTONDOWN		左/中/右键按下
+					L/M/R BUTTONUP			松开
+					L/M/R BUTTONBLCLK		双击
+					MOUSEWHEEL			+ 上；- 下 滚动
+					MOUSEHWHEEL			+ 左；- 右
+
+		// flags = EVENT_FLAG_
+					L/M/R BUTTON			鼠标正按下
+					CTRLKEY					ctrl
+					SHIFTKEY				shift
+					ALTKEY					alt
+
+int waitKey(int delay=0);
+	// 返回按键ASCII值
