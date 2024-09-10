@@ -1,0 +1,121 @@
+直线拟合：
+    M-estimator：类似最小二乘法
+        选取距离函数 d(r)，r为残差的绝对值
+        计算损失函数 sum(d(r)) 最小时的直线参数k,b
+        定义权重函数 w(r)=d'(r)/r，d'(r)为d(r)导数
+        迭代计算加权损失函数 sum(w(r)*d(r))最小时的k,b
+        当|k_(i) - k_(i-1)| < dk,
+          |b_(i) - b_(i-1)| < db 时，输出
+        // 该方法能减小极端残差的影响
+
+    void fitLine(In points, Out line, int distType,
+        double param, double reps, double aeps);
+        - points：二维或三维点集
+        - line：4f/6f (kx, ky (,kz), x, y (,z)) // 点斜式
+        - distType=DIST_    d(r)                        C
+                L1          r
+                L2          r*r/2
+                L12         2*(sqrt(1+r*r/2)-1)
+                FAIR        C*C*(r/C-log(1+r/C)         1.3998
+                WELSCH      C*C*(1-exp(-r**2/C**2))/2   2.9846
+                HUBER       r*r/2       r<C
+                            C*(r-C/2)   r>=C            1.345
+        - param：某些d(r)中的参数值（C），0则使用默认参数
+        - reps：原点到直线距离精度，0则自适应
+        - aeps：角度精度，0则自适应
+
+圆形检测：
+    圆形方程 (x-a)**2 + (y-b)**2 = R
+    圆上每个点(x_, y_)转换到关于(a, b)的参数空间为
+        (a-x_)**2 + (b-y_)**2 = R
+    遍历，累加，与阈值比较
+
+    void HoughCircles(In image, Out circles, int method, double dp,
+        double minDist, double param1=100, double param2=100,
+        int minRadius, int maxRadus);
+        - image：必须CV_8UC1
+        - circles：3i (a, b, R)
+        - method = HOUGH_GRADIENT
+        - dp = 图像分辨率/离散化分辨率
+        - minDist：圆心距离 < minDist则视为同一个圆
+        - param1：Canny两个阈值中较大的一个，另一个=param1/2
+        - param2：累加器阈值
+        - min/maxRadius：要检测的圆的半径范围
+        * 该函数会先调用Canny进行边缘检测
+
+轮廓检测：
+    void findContours(In image, OutArrays contours,
+         int mode, int method, Point offset=Point());
+        - image：CV_8UC1，只分0和非0
+        - contours：vector<vector<Point> / Mat>
+        - mode=RETR_
+                    EXTERNAL    只检测最外层轮廓
+                    LIST        检测所有轮廓，但不建立等级关系
+                    CCOMP       检测所有，但只分连通域（环）的内外关系
+                    TREE        检测所有，完整等级关系
+        - method=CHAIN_APPROX_
+                    NONE        保留轮廓的所有点
+                    SIMPLE      压缩轮廓的水平、垂直和对角线，只保留顶点
+                    TC89_L1
+                    TC89_KCOS
+
+    void findContours(In image, OutArrays contours, Out hierarchy,
+        int mode, int method, Point offset=Point());
+        - hierarchy：描述轮廓空间关系的4维向量
+            如果一个轮廓B在A内部，则AB为父子关系，索引，-1则无
+            4i (下一个兄弟轮廓，上一个兄弟轮廓，第一个子轮廓，父轮廓)
+
+    void drawContours(InOut image, InArrays contours, int contourIdx,
+        const Scalar &color, int thickness=1, int lineType=LINE_8,
+        In hierarchy=noArray(), int maxLevel=INT_MAX, Point offset=Point());
+        - contourIdx：要绘制的轮廓的索引，-1则绘制所有
+        - maxLevel：0->只绘制该轮廓；1->同时绘制其所有子轮廓；以此类推
+
+    面积：
+        double contourArea(In contour, bool oriented=false);
+            - orientede：面积是否有方向性
+
+    周长：
+        double arcLength(In curve, bool closed);
+        - closed：是否计算第一个和最后一个点的距离
+
+    点到轮廓距离：
+        double pointPolygonTest(In contour, Point2f pt, bool measureDist);
+        - measureDist=false：在轮廓内，返回1；轮廓上返回0；外返回-1
+                    =true：返回距离值；内正外负
+
+    包围：
+        三角形：
+        void minEnclosingTriangle(In points, Out triangle);
+
+        圆形：
+        void minEnclosingCircle(In points, Point2f &center, float &radius);
+        // 后两个参数是输出用的
+
+        多边形：
+        Rect boundingRect(In array);
+
+        RotatedRect minAreaRect(In points);
+        // 旋转矩阵
+
+        void approxPolyDP(In curve, Out approxCurve, double epsilon, bool closed);
+        - epsilon：逼近曲线上点到原始曲线的最大距离
+        - closed：approxCurve[0] == approxCurve[end]
+
+    凸包：
+        void convexHull(In points, Out hull, bool clockwise=false, bool returnPoints=true);
+        - clockwise：输出点顺序；true顺，false逆
+        - returnPoints：true输出点坐标，false输出点关于points的索引
+
+二维码检测：
+    class QRCodeDetector:
+
+        bool detect(In img, Out points);
+        - points：二维码四个顶点
+        // 输出是否检测到二维码
+
+        string decode(In img, In points, Out straight_qrcode=noArray());
+        - straight_qrcode：经过矫正和二值化的二维码
+
+        string detectAndDecode(In img, Out points=noArray(), Out straight_qrcode=noArray());
+

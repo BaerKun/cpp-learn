@@ -253,7 +253,7 @@ void hist2img1D(const Mat &hist, Mat &img, const int width, const int height) {
     flip(img, img, 0);
 }
 
-void hist2img2D(const Mat &hist, Mat &img, const int width, const int height, const double brigtnessHance=10.) {
+void hist2img2D(const Mat &hist, Mat &img, const int width, const int height, const double brigtnessHance) {
     img = Mat::ones(height, width, CV_8U);
     const int npointsX = hist.cols,
     npointsY = hist.rows;

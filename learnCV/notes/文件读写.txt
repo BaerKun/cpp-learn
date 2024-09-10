@@ -10,7 +10,7 @@ Mat imread(const String &filename, int flags=IMREAD_COLOR);
 				ANYCOLOR
 				LOAD_GDAL
 				REDUCED_GRAYSCALE_2/4/8：转单灰，并缩小至2/4/8分之一
-						      COLOR_2/4/8：rgb，并缩小
+				COLOR_2/4/8：rgb，并缩小
 				IGNORE_ORIENTATION
 
 	// 不同标志在不冲突情况下可以用 | 隔开
@@ -26,14 +26,14 @@ bool imwrite(const String &filename, InputArray img,
 
 	params.push_back(参数)
 	// params.push_back(值) 如果需要
-		IMWRITE_							范围		默认
-				JPEG_QUALITY			0~100	95
-					    PROGRESSIVE		0/1		0
-					    OPTIMIZE			0/1		0
-					    LUMA_QUALITY		0~100	0
-					    CHPOMA_QUALITY	0~100	0
-				PNG_COMPRESSION		0~9		1
-				TIFF_COMPRESSION		/		/
+		IMWRITE_					范围		默认
+				JPEG_QUALITY	    0~100	95
+				PROGRESSIVE	        0/1		0
+				PTIMIZE		        0/1		0
+				LUMA_QUALITY        0~100	0
+                CHPOMA_QUALITY      0~100	0
+				PNG_COMPRESSION	    0~9		1
+				TIFF_COMPRESSION	/		/
 
 视频：
 

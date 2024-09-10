@@ -34,7 +34,7 @@ waitKey(int delay);
 	// 如果delay == 0，则没有时间限制
 	// 如果没有等待输入，窗口会立刻关闭
 
-﻿滑动条：
+滑动条：
 	int createTrackbar(const String &trackbarname, const String &winname,
 		int *value, int count, TackbarCallback onChange=0, void *userdata=0);
 		// value：滑动条要改变的值，只能int

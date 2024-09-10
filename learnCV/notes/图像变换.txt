@@ -9,7 +9,7 @@ void copyTo(InArr src, OutArr dst, InArr mask);
 
 	纵向：
 		void hconcat(...);
-				        (...);
+			        (...);
 
 变换尺寸：
 	void resize(InputArray src, OutputArray dst, Size dsize,

@@ -11,4 +11,10 @@ void GaussianNoise(cv::Mat &mat, double mean, double std);
 
 int twoPass(cv::Mat &image, cv::Mat &label, int connectivity = 8, int labelType = CV_32S);
 
+void hist2img1D(const cv::Mat &hist, cv::Mat &img, int width, int height);
+
+void hist2img2D(const cv::Mat &hist, cv::Mat &img, int width, int height, double brigtnessHance=10.);
+
+void histMatch(const cv::Mat &src, const cv::Mat &hist, cv::Mat &dst);
+
 #endif //LEARNCV_MYALG_H
