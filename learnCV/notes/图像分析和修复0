@@ -1,0 +1,58 @@
+傅里叶变换：
+    void dft(In src, Out dst, int flags=0, int nonzeroRows=0);
+
+积分图像：
+    原图(w, h) -> 积分图像(w + 1, h + 1)：
+        I'(X, Y) = sum(f(I(x, y)))
+
+    标准求和：f(I) = I           0 <= x < X, 0 <= y < Y
+    平方求和：f(I) = I ** 2      0 <= x < X, 0 <= y < Y
+    倾斜求和：f(I) = I           abs(X - x) < Y - y, 0 <= y < Y
+
+    void integral(In src, Out sum, int sdepth=-1);
+    // 标准求和
+    - src: CV_8U/32F/64F
+    - sdepth：输出数据类型，CV_32S/32F/64F
+
+    void integral(In src, Out sum, Out sqsum, [Out tilted,] int sdepth=-1, int sqdepth=-1);
+    - tilted：倾斜求和，数据类型和sum相同
+    - sqdepth=CV_32F/64F
+
+图像分割：
+    漫水填充法：
+        1.选择种子点，加入区域
+        2.以区域中一点为中心，计算4或8邻域的像素和该点的差值，将差值小于阈值的点加入区域
+        3.递归
+
+        int floodFill(InOut image, [InOut mask,] Point seedPoint, Scalar newVal, Rect *rect=0,
+            Scalar loDiff=Scalar(), Scalar upDiff=Scalar(), int flags=4);
+            - mask：填充区域的标记，需要提前初始化；而且宽高需要比image大2，用来提供边界缓冲
+            - newVal：区域填充的值（在image）
+            - Rect：区域的矩形范围
+            - loDiff, upDiff：只有像素值在 [seed - loDiff, seed + upDiff] 内的点才会被加到区域
+            - flags：4/8（邻域）+ FLOODFILL_FIXED_
+                                                RANGE   只考虑与种子的差值，否则用每次递归的中心点和邻域做差
+                                                MASK_ONLY   不改变image    若没有输入mask则没用
+            // 返回区域点个数
+
+    分水岭法：
+        类似漫水填充，都从种子出发，但是通过比较梯度，并以一个优先队列选取下一个操作点。
+        梯度小的点被优先分配
+        该方法会将整张图像分为若干区域，并划出边界（分水岭）
+
+        void watershed(In image, InOut markers);
+        - markers：与image尺寸相同的CV_32SC1图像，
+            输入：
+                0 -> 背景，算法需要分割的区域
+                >0 -> 种子，不同的值会当作不同的“水域”
+            输出：
+                >0 -> 不同的区域
+                -1 -> 区域的边界（分水岭）
+        // 8-邻域
+
+    Grabcut：
+        void grabCut(...);
+
+    Mean-Shift：
+        void pyrMeanShiftFiltering(...);
+

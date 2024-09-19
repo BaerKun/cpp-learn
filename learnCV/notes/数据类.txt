@@ -126,3 +126,9 @@ Scalar:
 Point:
 	Point(...);
 	x, y, z
+
+TermCriteria:
+    // 迭代终止条件
+    TermCriteria(int type, int maxCount, double epsilon);
+        - type = TermCriteria::COUNT / MAX_ITER     迭代次数
+                                EPS                 精度

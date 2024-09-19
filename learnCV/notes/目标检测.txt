@@ -1,3 +1,48 @@
+直线检测：
+	（标准）
+	霍夫变换：将关于x、y的原空间转换到关于k、b的参数空间
+			点(x, y)		->	直线b=-kx+y（过点xy的直线束）
+			直线y=kx+b	->	点(k, b)
+		将原图像的每个点变换到离散参数空间，记录每个离散点(k, b)的经过次数，超过阈值则确定直线y=kx+b
+		将直线检测转换为寻找参数空间中的直线交点
+		* 因为垂直于x轴的直线上的点经过变换后，成为一系列平行线，当k很大时，也有较大误差
+		* 所以先将参数变换为(r：原点到直线的距离，theta：直线和x轴的夹角），直线r = x cos(theta)+y sin(theta)
+		* 点(x, y）-> r = A sin(theta + phi)，仍是寻找交点
+	
+	// 只能检测直线存在，不能获取线段位置（两端点）
+
+	概率霍夫变换：随机选择边缘点，当某一离散点的经过次数超过阈值后，不在继续继续累积
+
+	多层次霍夫变换：经过一次标准霍夫变换，统计经过次数；
+				变换一次r和theta的离散化的单位长度，重新统计；
+				结合两次结果，得到结果
+
+	void HoughLines(InArr images, OutArr lines, double rho, double theta, int threshold,
+		double srn=0, double stn=0, double min_theta=0, double max_theta=CV_PI);
+	- images：CV_8UC1的二值图；需要经过边缘检测
+	- lines：Mat | vector<Vec2f>，(r, theta)
+	- rho：距离分辨率（r离散化的单位长度，单位：像素）
+	- theta：角度分辨率（单位：弧度）
+	- threshold：离散点确定为直线的累加器阈值
+	- srn：用于多尺度霍夫变换，距离分辨率' = rho / srn
+	- stn：类似srn；若两者皆0，则只用标准霍夫变换
+	- min/max_theta：识别直线的角度范围
+
+	void HoughLinesP(InArr image, OutArr lines, double rho, double theta,
+		int threshold, double minLineLength=0, double maxLineGap=0);
+		// 渐进概率式霍夫变换；能获取直线的端点
+		- lines：Mat | vector<Vec4i>，(Px, Py, Qx, Qy)
+		- minLineLength：识别直线的最小长度
+		- maxLineGap：当两条线段的斜率相同，且两条直线端点的距离小于该参数，则合并为一条
+
+	void HoughLinesPointSet(InArr _point, OutArr _lines, int lines_max, int threshold,
+		double min_rho, double max_rho, double rho_step,
+		double min_theta, double max_theta, double theta_step);
+	// 点集检测直线
+	- _point：Mat(C2) | vector<Point2f/i> -> (x, y)
+	- _lines：Mat(CV_64FC3) -> (经过次数, r, theta)，以经过次数倒序
+	- lines_max：最多检测的直线数量
+	
 直线拟合：
     M-estimator：类似最小二乘法
         选取距离函数 d(r)，r为残差的绝对值
@@ -69,6 +114,7 @@
         const Scalar &color, int thickness=1, int lineType=LINE_8,
         In hierarchy=noArray(), int maxLevel=INT_MAX, Point offset=Point());
         - contourIdx：要绘制的轮廓的索引，-1则绘制所有
+        - thickness：可以=-1
         - maxLevel：0->只绘制该轮廓；1->同时绘制其所有子轮廓；以此类推
 
     面积：
