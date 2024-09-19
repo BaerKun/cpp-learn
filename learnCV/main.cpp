@@ -1,24 +1,31 @@
 #include "opencv2/opencv.hpp"
 #include "myalg.h"
-#include <chrono>
+#include "timer.h"
 
 using namespace std;
 using namespace cv;
 
 
 int main() {
-    Mat img = imread("../bears.jpeg");
-    Mat mark = Mat::zeros(img.size(), CV_32SC1);
+    Mat img = imread("../colorful.jpeg");
+    Mat Rimg, outimg = img.clone();
+    vector<KeyPoint> kps;
+
+    cvtColor(img, img, COLOR_BGR2GRAY);
+    normalize(img, img, 0, 255, NORM_MINMAX);
+    cornerHarris(img, Rimg, 3, 3, 0.02);
+
+    for (int i = 0; i < Rimg.rows; i++) {
+        for (int j = 0; j < Rimg.cols; j++) {
+            if (Rimg.at<float>(i, j) > 0.005) {
+                kps.emplace_back(j, i, 3);
+            }
+        }
+    }
+    drawKeypoints(img, kps, outimg, Scalar::all(-1), DrawMatchesFlags::DRAW_OVER_OUTIMG);
 
 
-    watershed(img, mark);
-    for(int i = 0; i < mark.rows; i++)
-        for(int j = 0; j < mark.cols; j++)
-            if(mark.at<int>(i, j) == -1)
-                img.at<Vec3b>(i, j) = Vec3b(255, 255, 255);
-
-    imshow("img", img);
+    imshow("img", outimg);
     waitKey();
-
     return 0;
 }

@@ -27,9 +27,9 @@ void saltAndPepperNoise(const Mat &mat, const double ratio) {
                 case 3:
                 case 4:
                     if (iswhite)
-                        *(unsigned *) dataptr |= 0x00ffffff;
+                        memset(dataptr, 0xff, 3);
                     else
-                        *(unsigned *) dataptr &= 0xff000000;
+                        memset(dataptr, 0, 3);
             }
         }
 

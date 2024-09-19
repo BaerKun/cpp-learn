@@ -4,12 +4,12 @@
 #include "opencv2/opencv.hpp"
 
 // only CV_8UC1/3/4
-void saltAndPepperNoise(cv::Mat &mat, double ratio);
+void saltAndPepperNoise(const cv::Mat &mat, double ratio);
 
 // no alpha
 void GaussianNoise(cv::Mat &mat, double mean, double std);
 
-int twoPass(cv::Mat &image, cv::Mat &label, int connectivity = 8, int labelType = CV_32S);
+int twoPass(const cv::Mat &image, cv::Mat &label, int connectivity = 8, int labelType = CV_32S);
 
 void hist2img1D(const cv::Mat &hist, cv::Mat &img, int width, int height);
 

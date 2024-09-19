@@ -1,0 +1,50 @@
+角点：定义在邻域中的某个运算 取极大值的点，
+    如灰度值极大值点、曲线端点和交点
+特征点：包含图像特征的点，如角点
+关键点：特征点中所需要的，或特征最明显的点
+
+class KeyPoint:
+    float angle;
+    int class_id;
+    int octave;         // 来源（金字塔）
+    Point2f pt;
+    float response;
+    float size;         // 邻域直径
+
+    KeyPoint(Point2f pt, float size, float angle=-1, float response=0, int octave, int class_id);
+    KeyPoint(float x, float y, ...);
+
+void drawKeypoints(In image, const vector<KeyPoint> &keypoints, InOut outImage,
+    const Scalar &color=Scalar::all(-1), DrawMatchesFlags flags=DrawMatchesFlags::DEFAULT);
+    - color：空心圆，默认（每个都是）随机颜色
+    - flags=...::DEFAULT
+                DRAW_OVER_OUTIMG        直接覆盖ouImage
+                NOT_DRAW_SINGLE_POINTS  不绘制单个关键点
+                DRAW_RICH_KEYPOINTS     同时绘制圆的大小和方向
+
+角点检测：
+    Harris:
+        寻找 sum(w * I(x, y)) 极大值，(x, y) ∈ 邻域
+        考虑 E(Δx, Δy) = sum(w * (I(x + Δx, y + Δy) - I(x, y)) ** 2)
+        用一阶偏导近似   ≈ sum(w * (I'x * Δx + I'y * Δy) ** 2)     I'x, I'y : 梯度
+        设 M = sum(w * [I'x ** 2,   I'x * I'y]
+                      [I'x * I'y,   I'y ** 2] )
+        则 E = [Δx, Δy] * M * [Δx,
+                              Δy]
+        设M的特征值 t1, t2
+        因为 w, I'x ** 2, I'y ** 2 >= 0
+        且 I'x ** 2 + I'y ** 2 >= 2 * I'x * I'y
+        那么 t1, t2 >= 0
+        设 R = t1 * t2 - k * (t1 + t2) ** 2      // k一般取 0.02 ~ 0.06
+
+        1.R较大时，说明t1, t2较大，该点可能是角点      // 一般阈值0.01 ~ 0.1
+        2.R较小时，说明该点较平缓
+        3.R < 0时，说明t1, t2相差较大，该点可能是边缘
+
+        // w 可以说常数，也可以是邻域中的变量
+
+        void cornerHarris(In src, Out dst, int blockSize, int ksize, double k,
+            int borderType=...);
+        - src: CV_8U/32FC1 -> dst(R): CV_32F
+        - blockSize：邻域大小
+        - ksize：计算梯度时，Sobel算子的大小

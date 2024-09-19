@@ -15,3 +15,5 @@ link_libraries(${OpenCV_LIBS})
 add_executable(main main.cpp)
 
 add_library(somealg myalg.cpp)
+
+target_link_libraries(main somealg)
