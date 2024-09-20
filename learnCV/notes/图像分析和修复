@@ -1,6 +1,45 @@
 傅里叶变换：
     void dft(In src, Out dst, int flags=0, int nonzeroRows=0);
+    - src: CV_32/64FC1/2
+    - dst: C1/2         // C1实数，C2复数
+    - flags=DFT_
+                INVERSE         逆变换
+                SCALE           输出处以元素个数N
+                ROWS            对每行做一维傅里叶变换，否则做二维变换
+                COMPLEX_OUTPUT  输出复数
+                REAL_OUTPUT     输出实数
+                COMPLEX_INPUT   输入复数
+    - nonzeroRows：非零行数，用于减少计算；默认计算所有行
 
+    void idft(In src, Out dst, int flags=0, int nonzeroRows=0);
+    // 逆傅里叶变换，相当于 dft + DFT_INVERSE
+
+    int getOptimalDFTSize(int vecsize);
+    // 返回>=vecsize的2、3、5的最小公倍数
+    // 为了加速快速傅里叶变换FFT的递归
+
+    void copyMakeBorder(In src, Out dst, int top, int bottom, int left, int right,
+        int borderType, const Scalar &value=Scalar());
+        // 填充
+
+    void magnitude(In x, In y, Out magnitude);
+    // 计算幅值=sqrt(x ** 2 + y ** 2)
+
+    void mulSpectrums(In a, In b, Out c, int flags, bool conjB=false);
+    // 频谱相乘，即傅里叶变换输出结果
+    - flags：同上
+    - conjB：是否对b进行共轭变换
+
+
+余弦变换：
+    // 即傅里叶变换结果只取实数
+
+    void dct(In, Out, int flags=0);
+    - flags=DCT_INVERSE/ROWS
+
+    void idct(In, Out, int flags=0);
+    
+    
 积分图像：
     原图(w, h) -> 积分图像(w + 1, h + 1)：
         I'(X, Y) = sum(f(I(x, y)))
@@ -17,6 +56,7 @@
     void integral(In src, Out sum, Out sqsum, [Out tilted,] int sdepth=-1, int sqdepth=-1);
     - tilted：倾斜求和，数据类型和sum相同
     - sqdepth=CV_32F/64F
+
 
 图像分割：
     漫水填充法：
@@ -56,3 +96,10 @@
     Mean-Shift：
         void pyrMeanShiftFiltering(...);
 
+
+图像修复：
+    void inpaint(In src, In inpaintMask, Out dst, double inpaintRadius, int flags);
+    - inpaintMask：需要修复的像素标记
+    - flags=INPAINT_
+                    NS      Navier-Stokes
+                    TELEA   Alexandru Telea
