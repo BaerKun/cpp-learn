@@ -1,8 +1,10 @@
-角点：定义在邻域中的某个运算 取极大值的点，
+角点(corner)：定义在邻域中的某个运算 取极大值的点，
     如灰度值极大值点、曲线端点和交点
 特征点：包含图像特征的点，如角点
 关键点：特征点中所需要的，或特征最明显的点
+描述子：描述特征点的一串数字，可以用于区分和匹配
 
+关键点：
 class KeyPoint:
     float angle;
     int class_id;
@@ -13,6 +15,7 @@ class KeyPoint:
 
     KeyPoint(Point2f pt, float size, float angle=-1, float response=0, int octave, int class_id);
     KeyPoint(float x, float y, ...);
+
 
 void drawKeypoints(In image, const vector<KeyPoint> &keypoints, InOut outImage,
     const Scalar &color=Scalar::all(-1), DrawMatchesFlags flags=DrawMatchesFlags::DEFAULT);
@@ -48,3 +51,88 @@ void drawKeypoints(In image, const vector<KeyPoint> &keypoints, InOut outImage,
         - src: CV_8U/32FC1 -> dst(R): CV_32F
         - blockSize：邻域大小
         - ksize：计算梯度时，Sobel算子的大小
+
+    Shi-Tomas:
+        和Harris一样，除了 R = min(t1, t2)
+
+        void goodFeaturesToTrack(In image, Out corners, int maxCorners, double qualityLevel,
+            double minDistance, In mask=noArray(), int blockSize=3,
+            bool useHarrisDetector=false, double k=0.04);
+            - coners: Point2f
+            - qualityLevel：R的阈值 = max(Ri) * qualityLevel
+            - useHarrisDetector：是否使用Harris角点检测，否则使用Shi-Tomas
+
+特征点：
+    class Feature2D: // 特征点基类，所有特征点类都会继承
+        virtual void detect(In image, vector<KeyPoint> &keypoints, In mask=noArray());
+
+        virtual void compute(In image, vector<KeyPoint> &keypoints, Out descriptors);
+            // 计算描述子
+
+        virtual detectAndCompute(In image, In mask, vector<KeyPoint> &keypoints, Out descriptors,
+            bool useProvidedKeypoints=false);
+            - useProvidedKetpoints：是否使用keypoints中已经有的关键点
+                                    true -> 与compute同；
+                                    false -> 识别+计算
+
+    ORB = FAST + BRIEF：
+        FAST角点：
+            1. 取一点p
+            2. 设 阈值Tp = Ip * 0.2
+            3. 在以p为圆心、直径7的圆中，若存在连续N个像素值在[0, Ip - Tp]|[Ip + Tp, 255]中，
+                则将p确定为FAST角点。（N一般取12，p为FAST-12角点）
+
+        方向：
+            p指向矩形邻域的质心 (sum(x * Ixy) / sum(Ixy), sum(y * Ixy) / sum(Ixy))
+
+        尺度：
+            取多层图像金字塔，在每层金字塔进行识别 // 尺度不变性
+
+        BRIEF描述子：
+            在p的邻域内取 N对点对(q, r)
+            若 Iq > Ir 则取1，否则0
+            得到N位0/1描述子
+
+            在ORB中，会预定义一个邻域内的点对集，并在每个角点按照其方向进行旋转 // 方向不变性
+
+        Ptr<ORB> ORB::create(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8,
+            int edgeThreshold=31, int firstLevel=0, int MAX_K=2,
+            ORB::ScoreType scoreType=ORB::HARRIS_SCORE, int patchSize=31, int fastThreshold=20);
+            - scaleFactor：金字塔n->n+1的缩小
+            - nlevels/firstLevel：金字塔层数和原图所在层数
+            - edgeThreshold：计算角点时距离图像边缘的距离 <该值 时，忽略
+            - MAX_K：影响描述子长度
+            - scoreType：HARRIS/FAST_SCORE
+            - patchSize：计算质心和描述子时的矩形尺寸
+            - fastThreshold：FAST检测阈值，单位：%，即 Tp = Ip * fastThreshold * 1%
+
+特征点匹配：
+    class DMatch:
+        float distance;
+        int imgIdx;
+        int query;
+        int train;
+
+    class DescriptorMatcher: // 基类
+
+    查询描述子 -> 训练描述子：
+        描述子距离：看成逐位向量
+
+    void match(In queryDescriptors, In trainDescriptors, vector<DMatch> &matches, In mask=noArray());
+        // 每个query匹配一个最佳的train
+
+    void knnMatch(In, In, vector<vector<DMatch>> &matches, int k, In mask=noArray(), bool compactResult=false);
+        // 每个query匹配最多k个train，自适应阈值
+        - compactResult: false -> matches保留匹配数为0的vector<DMatch>，使matches.size==queryDesc.size
+
+    void radiusMatch(..., float maxDistance, ...);
+        // 匹配距离小于阈值的所有
+
+    void BFMatcher::BFMatcher(int norType=NORM_L2, bool crossCheck=false);
+        - crossCheck：是否只有在query和train能相互匹配时才保留
+
+    void drawMatches(In img1, const vector<KeyPoint> &keypoints1, In img2, const vector<KeyPoint> &keypoints2,
+        const vector<DMatch> &matches1to2, InOut outImg, const Scalar &matchColor=Scalar::all(-1),
+        const Scalar &singlePointColor=Scalar::all(-1), const vector<char> &matcherMask=vector<char>(),
+        DrawMatcherFlags flags=DrawMatchesFlags::DEFAULT);
+        // 将img1和img2合并，再按照matches将关键点用直线连接

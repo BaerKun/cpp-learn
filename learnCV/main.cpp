@@ -5,27 +5,30 @@
 using namespace std;
 using namespace cv;
 
-
 int main() {
+    setLogLevel(utils::logging::LOG_LEVEL_SILENT);
+
     Mat img = imread("../colorful.jpeg");
-    Mat Rimg, outimg = img.clone();
+    Mat Rimg, outimg;
     vector<KeyPoint> kps;
-
+    Mat desc;
+;
     cvtColor(img, img, COLOR_BGR2GRAY);
-    normalize(img, img, 0, 255, NORM_MINMAX);
-    cornerHarris(img, Rimg, 3, 3, 0.02);
+    auto orb =  ORB::create(20);
+    orb->detectAndCompute(img, noArray(), kps, desc);
 
-    for (int i = 0; i < Rimg.rows; i++) {
-        for (int j = 0; j < Rimg.cols; j++) {
-            if (Rimg.at<float>(i, j) > 0.005) {
-                kps.emplace_back(j, i, 3);
-            }
-        }
+    cout << desc.size() << endl;
+
+    for(auto &kp : kps) {
+        cout << kp.pt << endl;
+        cout << kp.angle << endl;
+        cout << kp.octave << endl;
+        cout << kp.size << endl << endl;
     }
-    drawKeypoints(img, kps, outimg, Scalar::all(-1), DrawMatchesFlags::DRAW_OVER_OUTIMG);
 
+    drawKeypoints(img, kps, outimg);
+    imshow("img", outimg.clone());
 
-    imshow("img", outimg);
     waitKey();
     return 0;
 }
