@@ -1,0 +1,66 @@
+void convertPointsToHomogeneous(In src, Out dst);
+    // 非其次坐标转齐次坐标
+
+void convertPointsFromHomogeneous(In src, Out dst);
+
+单目视觉：
+    标定：
+        bool findChessboardCorners(In image, Size patternSize, Out corners, int flags=...);
+            - pattern：角点行列数
+            // 输出是否找到所有角点
+
+        bool findCirclesGrid(In, Size, Out, int flags=..., const Ptr<FeatureDetector> &blobDetector=...);
+            // 寻找圆心
+
+        void drawChessboardCorners(InOut image, Size patternSize, In corners, bool patternWasFound);
+            - patternWasFound：corners是否找全角点
+
+    校准相机参数：
+        // 用世界坐标的众多点及其对应的像素坐标迭代优化相机内参和外参
+        double calibrateCamera(InArrays objectPoints, InArrays imagesPoints, Size imageSize,
+            InOut cameraMatrix, InOut distCoeffs, OutArrays rvecs, OutArrays tvecs,
+            int flags=0, TermCriteria criteria=TermCriteria(COUNT+EPS, 30, DBL_EPSILON));
+            - objectPoints：世界坐标系三维坐标
+            - imagePoints：像素坐标系二维坐标
+            - imageSize：图像尺寸
+            - cameraMatrix：内参，初始化
+            - distCoeffs：畸变，初始化
+            - rvecs：旋转向量，方向代表旋转轴，模长=旋转角度
+            - tvecs：平移向量
+            // 输出重投影误差
+
+        // 初始化逆扭转校正映射
+        void initUndistortRectifyMap(In cameraMatrix, In distCoeffs, In R, In newCameraMatrix, Size size,
+            int m1type, Out map1, Out map2);
+            - R：旋转矩阵
+            - newCameraMatrix：需要映射到的新相机内参
+            - size：输出映射矩阵尺寸
+            - m1type：输出映射矩阵的数据类型CV_16SC2/32FC1/2
+            - map1/map2：每个像素映射的x、y坐标
+
+        // 重映射
+        void remap(In src, Out dst, In map1, In map2, int interpolation,
+            int borderType=..., const Scalar ...);
+            - interpolation：插值方法
+
+        void undistort(In src, Out dst, In cameraMatrix, In distCoeffs, In newCameraMatrix);
+
+    投影：
+        // 世界坐标 -> 像素坐标
+        void projectPoints(In objectPoints, In rvec, In tvec, In cameraMatrix, In distCoaffs,
+            Out imagePoints, Out jacobian=noArray(), double aspectRatio=0);
+
+    Pnp：
+        bool solvePnp(In objectPoints, In imagePoints, In cameraMatrix, In distCoeffs, Out rvec, Out tvec,
+            bool useExtrinsicGuess=false, int flags=SOLVEPNP_ITERATINE);
+            - useExtrinsicGuess：是否使用传入的rvec和tvec的初值，加速收敛
+            // 输出是否成功
+
+        bool solvePnpRansac(...);
+
+    旋转向量和矩阵转换：
+        void Rodrigue(In src, Out dst, Out jacobian=...);
+            // 可以互相转换
+
+
+
