@@ -18,3 +18,19 @@
     RotateRect CamShift(.../*同上*/);
         // 输出的旋转矩形，可以用椭圆绘制
 
+光流法：
+    稠密光流法：
+        // 计算所有像素
+        // Farneback多项式扩展算法
+        void calcOpticalFlowFarneback(In prev, In next, InOut flow, double pyr_scale, int levels,
+            int winsize, int iterations, int poly_n, double poly_sigma, int flags);
+            - prev/next：前一帧和当前帧 CV_8UC1
+            - pyr_scale：0~1
+            - flags=OPTFLOW_
+                            USE_INITIAL_FLOW    使用输入的flow做初始流
+                            FARNEBACK_GAUSSIAN  使用高斯滤波器
+
+    LK稀疏光流法：
+        // 只计算部分像素（特征点）
+        void calcOpticalFlowPyrLK(In prevImg, In nextImg, In prevPts, InOut nextPts, Out status, Out err,
+            Size winSize=Size(21, 21), int maxLevel=3, TermCriteria, int flags=0, double minEigThreshold=1e-4);

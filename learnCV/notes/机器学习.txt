@@ -1,0 +1,13 @@
+K均值：
+    有N个数据点，需要根据距离分为k类
+    1. 随机生成k个中心点
+    2. 遍历所有数据，根据和中心的距离分类
+    3. 计算每类数据的均值，将其作为新的中心点
+    4. 重复2、3步
+
+    double kmeans(In data, int k, InOut bestLabels, TerCriteria criteria,
+        int attempts, int flags, Out centers=noArray());
+        - attempts：算法尝试次数，即从第一步重新开始，防止算法进入局部最优
+        - flags= KMEANS_
+                        RANDOM_CENTERS      每次初始化随机中心点
+                        USE_INITIAL_LABELS  第一次使用输入的labels
