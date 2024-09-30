@@ -61,5 +61,9 @@ waitKey(int delay);
 					SHIFTKEY				shift
 					ALTKEY					alt
 
+Rect selectROI(const String &windowName, In img, bool showCrossshair=true, bool fromCenter=false);
+    - showCrossshair：显示十字准星
+    - fromCenter：是否从中心开始
+
 int waitKey(int delay=0);
 	// 返回按键ASCII值

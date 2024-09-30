@@ -8,27 +8,9 @@ using namespace cv;
 int main() {
     setLogLevel(utils::logging::LOG_LEVEL_SILENT);
 
-    Mat img = imread("../colorful.jpeg");
-    Mat Rimg, outimg;
-    vector<KeyPoint> kps;
-    Mat desc;
-;
-    cvtColor(img, img, COLOR_BGR2GRAY);
-    auto orb =  ORB::create(20);
-    orb->detectAndCompute(img, noArray(), kps, desc);
+    VideoCapture cap(R"(C:\Users\B3220\Desktop\jjj.mp4)");
 
-    cout << desc.size() << endl;
+    meanShiftTrack(cap);
 
-    for(auto &kp : kps) {
-        cout << kp.pt << endl;
-        cout << kp.angle << endl;
-        cout << kp.octave << endl;
-        cout << kp.size << endl << endl;
-    }
-
-    drawKeypoints(img, kps, outimg);
-    imshow("img", outimg.clone());
-
-    waitKey();
     return 0;
 }

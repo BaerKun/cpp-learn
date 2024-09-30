@@ -1,19 +1,20 @@
 图像直方图：
 	# 统计图像像素值出现的次数
-	void calcHist(const Mat *images, int nimages, const int *channels, InArr mask, OutArr hist, int dims, const int *histSize, const float **ranges, bool uniform=true, bool accumulate=false);
+	void calcHist(const Mat *images, int nimages, const int *channels, InArr mask, OutArr hist, int dims,
+	    const int *histSize, const float **ranges, bool uniform=true, bool accumulate=false);
 	// images：尺寸和数据类型须相同，且须是CV_8U/CV_16U/CV_32F
 	// nimages：images的个数
-	// channels：要统计的通道
-		通道索引： [0, images[0] + images[1] + ... - 1]
+	// channels：要统计的通道，所有images顺序索引
+		通道索引： [0, 2, 5, ...]
 	// mask：要统计的图像的区域，必须CV_8U
 	// hist：输出的直方图（特殊的矩阵）
 		* channels() = 1; rows = cols = -1; type() = CV_32F;
 		* 访问：hist.at<float>(c0, c1, c2, ...)
 			像素组合 (c0, c1, c2, ...) 的个数
 	// dims：hist的维度数，即channels的元素个数
-	// histSize：直方图每个维度的统计分区个数
+	// histSize：直方图每个维度的统计区间个数，将像素值离散为histSize个区间
 	// ranges：每个维度对应通道的像素值的取值范围
-		# 默认每个分区的大小及(ranges[1] - ranges[0]) / histSize
+		# 默认每个统计分区的大小及(ranges[1] - ranges[0]) / histSize
 	// uniform：直方图的分区大小是否均匀；false则要在ranges中指定...
 	// accumulate：是否累加；
 		即 hist.at<float>(...) += ###;
@@ -63,7 +64,8 @@
 直方图反向投影：
 	# 取图像局部的直方图，匹配目标直方图，寻找与其相似的区域
 	
-	void calcBackProject(const Mat *images, int nimages, const int *channels, InArr hist, OutArr backProject, const float **ranges, double scale=1, bool uniform=true);
+	void calcBackProject(const Mat *images, int nimages, const int *channels, InArr hist,
+	    OutArr backProject, const float **ranges, double scale=1, bool uniform=true);
 	// 大部分参数和calcHist类似，针对images,目标直方图hist,输出backProject
 	// backProject：和 images 中图像的尺寸和数据类型相同的单通道灰度图
 					图像中的区域的亮度越高，匹配度越高

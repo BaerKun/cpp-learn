@@ -17,4 +17,6 @@ void hist2img2D(const cv::Mat &hist, cv::Mat &img, int width, int height, double
 
 void histMatch(const cv::Mat &src, const cv::Mat &hist, cv::Mat &dst);
 
+void meanShiftTrack(cv::VideoCapture &cap);
+
 #endif //LEARNCV_MYALG_H

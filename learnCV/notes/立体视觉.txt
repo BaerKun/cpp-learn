@@ -3,6 +3,9 @@ void convertPointsToHomogeneous(In src, Out dst);
 
 void convertPointsFromHomogeneous(In src, Out dst);
 
+
+*** 对于InOut参数，在迭代优化时会使用初值，可以避免重复计算 ***
+
 单目视觉：
     标定：
         bool findChessboardCorners(In image, Size patternSize, Out corners, int flags=...);
@@ -23,8 +26,8 @@ void convertPointsFromHomogeneous(In src, Out dst);
             - objectPoints：世界坐标系三维坐标
             - imagePoints：像素坐标系二维坐标
             - imageSize：图像尺寸
-            - cameraMatrix：内参，初始化
-            - distCoeffs：畸变，初始化
+            - cameraMatrix：内参
+            - distCoeffs：畸变
             - rvecs：旋转向量，方向代表旋转轴，模长=旋转角度
             - tvecs：平移向量
             // 输出重投影误差
@@ -47,6 +50,7 @@ void convertPointsFromHomogeneous(In src, Out dst);
 
     投影：
         // 世界坐标 -> 像素坐标
+        // 如果没有变换，相机内参就是投影矩阵
         void projectPoints(In objectPoints, In rvec, In tvec, In cameraMatrix, In distCoaffs,
             Out imagePoints, Out jacobian=noArray(), double aspectRatio=0);
 
@@ -63,4 +67,19 @@ void convertPointsFromHomogeneous(In src, Out dst);
             // 可以互相转换
 
 
+双目视觉：
+    标定：
+        void stereoCalibrate(InArrays objectPoints, InArrays imagePoints1, InArrays imagePoints2,
+            InOut cameraMatrix1, InOut distCoeffs1, InOut cameraMatrix2, InOut distCoeffs2, Size imageSize,
+            InOut R, InOut T, Out E, Out F, int flags=..., TermCriteria);
+            - R/T：相机坐标系 1 -> 2
+            - E：本质矩阵
+            - F：基础矩阵
 
+    校准：
+        void stereoRectify(In cameraMatrix1, In distCoeffs1, In, In, Size imageSize, In R, In T,
+            Out R1, Out R2, Out P1, Out P2, Out Q, ...);
+            - R1/R2：相机旋转矩阵
+            - P1/P2：相机投影矩阵（校正后的相机坐标系 -> 图像坐标系）
+            - Q：视差深度映射矩阵（Q）
+            // 校正后的相机1的投影 z * Pi = P1 * R1 * Pc;

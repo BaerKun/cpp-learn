@@ -20,6 +20,8 @@
 		// angle：椭圆旋转角度
 		// 都是顺时针
 
+    void ellipse(InOut img, RotatedRect &box, ...);
+
 	void eillpse2Poly(Point center, Size axes, int angle, int arcStart, int arcEnd, int delta,
 		std::vector<Point> &pts);
 		// 只返回描绘点的坐标
