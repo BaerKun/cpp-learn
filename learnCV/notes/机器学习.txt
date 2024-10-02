@@ -11,3 +11,61 @@ K均值：
         - flags= KMEANS_
                         RANDOM_CENTERS      每次初始化随机中心点
                         USE_INITIAL_LABELS  第一次使用输入的labels
+
+static Ptr<TrainData> ml::TrainData::create(In samples, int layout, In responses,
+    In varIdx=..., In sampleIdx=..., In sampleWeights=..., In varType=...);
+    - samples/responses：数据及其标签
+    - layout = ROW/COL_SAMPLE   每行/列为一个数据
+
+ml::StatModel::
+    // 传统机器学习
+
+    virtual bool train(const Ptr<TrainData> &trainData, int flags=0);
+        - flags=UPDATE_MODEL    使用新数据更新模型
+
+    virtual float predict(In samples, Out results=noArray(), int flags=0);
+
+    virtual void save(const String& filename);
+
+static Ptr<_Tp> Algorithm::load(const String &filename, const String &objname=String());
+    // 加载模型
+
+k近邻：
+    将输入数据与已知数据进行对比，选出差距最小的k个数据，统计其中最多的标签，作为输入数据的标签
+    ml::KNearest::
+        Ptr<KNearest> create();
+
+        float findNearest(In samples, int k, Out results, Out neighborResponses=noArray(), Out dist=noArray());
+            - neighborResponses/dist：最近的k个数据及其与samples的距离
+
+决策树：
+    类似与搜索二叉树，但是以更复杂的方式区分左右子树
+    Ptr<DTrees> ml::DTrees::create();
+
+随机森林：
+    由多个决策树组成，对输入数据的输出取决于所有决策树的投票
+    RTrees
+
+支持向量机：
+    SVM
+
+
+深度学习：
+dnn::
+    Net readNet(const String &model, const String &config="", const String &framework="");
+
+    // 预处理
+    Mat blobFromImages(InArrays images, double scalarfactor=1.0, Size=Size(),
+        const Scalar &mean=Scalar(), bool swapRB=false, bool crop=false, int ddepth=CV_32F);
+        - scalarfactor：像素值但缩放
+        - Size：输出矩阵的Size
+        - mean：每个像素值 - mean
+        - swap：交换R、B通道
+        - crop：在调整大小时使用中心裁剪，而不是缩放
+        - ddepth：输出的数据类型 CV_32F/CV_8U
+        *** 输出 (N, C, H, W) 格式的Mat数据 ***
+
+    Net::
+        void setInput(In blob, ...);
+
+        Mat forward();
