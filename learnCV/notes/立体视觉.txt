@@ -12,6 +12,10 @@ void convertPointsFromHomogeneous(In src, Out dst);
             - pattern：角点行列数
             // 输出是否找到所有角点
 
+        bool find4QuadCornerSubpix(In img, InOut corners, Size region_size);
+            - region_size：考虑的领域尺寸(3,3)/(5,5)等
+            // 亚像素优化角点
+
         bool findCirclesGrid(In, Size, Out, int flags=..., const Ptr<FeatureDetector> &blobDetector=...);
             // 寻找圆心
 

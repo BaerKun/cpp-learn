@@ -62,6 +62,17 @@ void drawKeypoints(In image, const vector<KeyPoint> &keypoints, InOut outImage,
             - qualityLevel：R的阈值 = max(Ri) * qualityLevel
             - useHarrisDetector：是否使用Harris角点检测，否则使用Shi-Tomas
 
+    亚像素级别角点优化：
+        // 像素级别的角度坐标都是整数，可以优化到浮点数
+        角点Q，领域内一点Pi
+        向量QPi，Pi梯度向量dPi
+        定义delta = sum(QPi * dPi)
+        优化Q使 delta->0
+
+        void cornerSubPix(In image, InOut corners, Size winSize, Size zeroZone, TermCriteria criteria);
+            - winSize：领域半径 直径=winSize*2+1
+            - zeroZone：不计算入内的领域半径
+
 特征点：
     class Feature2D: // 特征点基类，所有特征点类都会继承
         virtual void detect(In image, vector<KeyPoint> &keypoints, In mask=noArray());
